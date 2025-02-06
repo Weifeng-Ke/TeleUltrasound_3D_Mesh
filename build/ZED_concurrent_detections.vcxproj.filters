@@ -7,7 +7,7 @@
     <ClCompile Include="D:\New_Uni_Life\Year_4\Term_1\ELEC_491\StereoCam_Mesh\object detection\concurrent detections\cpp\src\TrackingViewer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="D:\New_Uni_Life\Year_4\Term_1\ELEC_491\StereoCam_Mesh\object detection\concurrent detections\cpp\src\main.cpp">
+    <ClCompile Include="..\..\..\StereoCam_Mesh\object detection\concurrent detections\cpp\src\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

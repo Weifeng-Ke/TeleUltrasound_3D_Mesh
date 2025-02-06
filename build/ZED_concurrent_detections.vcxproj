@@ -157,6 +157,7 @@
       </DebugInformationFormat>
       <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
       <OpenMPSupport>true</OpenMPSupport>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;CMAKE_INTDIR=\"Release\"</PreprocessorDefinitions>
@@ -346,7 +347,7 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <ClInclude Include="D:\New_Uni_Life\Year_4\Term_1\ELEC_491\StereoCam_Mesh\object detection\concurrent detections\cpp\include\utils.hpp" />
     <ClCompile Include="D:\New_Uni_Life\Year_4\Term_1\ELEC_491\StereoCam_Mesh\object detection\concurrent detections\cpp\src\GLViewer.cpp" />
     <ClCompile Include="D:\New_Uni_Life\Year_4\Term_1\ELEC_491\StereoCam_Mesh\object detection\concurrent detections\cpp\src\TrackingViewer.cpp" />
-    <ClCompile Include="D:\New_Uni_Life\Year_4\Term_1\ELEC_491\StereoCam_Mesh\object detection\concurrent detections\cpp\src\main.cpp" />
+    <ClCompile Include="..\..\..\StereoCam_Mesh\object detection\concurrent detections\cpp\src\main.cpp" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
