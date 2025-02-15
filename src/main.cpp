@@ -80,12 +80,15 @@ int main(int argc, char **argv) {
     // positional_tracking_parameters.set_as_static = true;
     zed.enablePositionalTracking(positional_tracking_parameters);
 
+
+    // MIKE - might not be necessary
+
     print("Skeleton Detection: Loading Module...");
     // Define the Objects detection module parameters
     BodyTrackingParameters body_tracking_parameters;
     body_tracking_parameters.enable_tracking = true;
     body_tracking_parameters.enable_segmentation = false; // designed to give person pixel mask
-    body_tracking_parameters.detection_model = BODY_TRACKING_MODEL::HUMAN_BODY_MEDIUM;
+    body_tracking_parameters.detection_model = BODY_TRACKING_MODEL::HUMAN_BODY_FAST; // options HUMAN_BODY_FAST or HUMAN_BODY_MEDIUM or HUMAN_BODY_ACCURATE
     body_tracking_parameters.instance_module_id = 0; // select instance ID
 
     returned_state = zed.enableBodyTracking(body_tracking_parameters);
@@ -99,7 +102,8 @@ int main(int argc, char **argv) {
     ObjectDetectionParameters object_detection_parameters;
     object_detection_parameters.enable_tracking = true;
     object_detection_parameters.enable_segmentation = false; // designed to give person pixel mask
-    object_detection_parameters.detection_model = OBJECT_DETECTION_MODEL::MULTI_CLASS_BOX_MEDIUM;
+    // MIKE - might be able to modify the detection model to only look for people
+    object_detection_parameters.detection_model = OBJECT_DETECTION_MODEL::MULTI_CLASS_BOX_FAST; // options MULTI_CLASS_BOX_FAST or MULTI_CLASS_BOX_MEDIUM or MULTI_CLASS_BOX_ACCURATE
     object_detection_parameters.instance_module_id = 1; // select instance ID
 
     print("Object Detection: Loading Module...");
@@ -114,8 +118,7 @@ int main(int argc, char **argv) {
     int detection_confidence_od = 20;
     ObjectDetectionRuntimeParameters detection_parameters_rt(detection_confidence_od);
     // To select a set of specific object classes:
-    detection_parameters_rt.object_class_filter = { OBJECT_CLASS::ELECTRONICS, OBJECT_CLASS::SPORT,
-        OBJECT_CLASS::ANIMAL, OBJECT_CLASS::BAG, OBJECT_CLASS::VEHICLE, OBJECT_CLASS::FRUIT_VEGETABLE };
+    detection_parameters_rt.object_class_filter = { OBJECT_CLASS::PERSON};
 
 
     // Detection runtime parameters
