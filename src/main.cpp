@@ -27,6 +27,8 @@
 #include <iostream>
 #include <fstream>
 #include <chrono>
+#include <iostream>
+#include <string>
 
 // Flag to disable the GUI to increase detection performances
 // On low-end hardware such as Jetson Nano, the GUI significantly slows
@@ -49,6 +51,29 @@ bool is_playback = false;
 void print(string msg_prefix, ERROR_CODE err_code = ERROR_CODE::SUCCESS, string msg_suffix = "");
 void parseArgs(int argc, char **argv, InitParameters& param);
 
+
+
+// New function to save a filtered point cloud as a .pcd file.
+void savePCD(const Mat& cloud, const std::string& filename) {
+    // Get the dimensions of the cloud.
+    int width = cloud.getWidth();
+    int height = cloud.getHeight();
+    int valid_points = 0;
+
+    // First, count the number of valid points.
+    for (int y = 0; y < height; y++) {
+        for (int x = 0; x < width; x++) {
+            sl::float4 point;
+            cloud.getValue<sl::float4>(x, y, &point, MEM::CPU);
+            // Check if the z coordinate is valid (you can adjust this condition as needed)
+            if (std::isnormal(point.z)) {
+                valid_points++;
+            }
+        }
+    }
+}
+
+
 int main(int argc, char **argv) {
 
 #ifdef _SL_JETSON_
@@ -62,7 +87,7 @@ int main(int argc, char **argv) {
     InitParameters init_parameters;
     init_parameters.depth_mode = DEPTH_MODE::NEURAL;
     init_parameters.depth_minimum_distance = 0.2f * 1000.0f;
-    init_parameters.depth_maximum_distance = 1.0f * 1000.0f;
+    init_parameters.depth_maximum_distance = 2.0f * 1000.0f;
     init_parameters.coordinate_system = COORDINATE_SYSTEM::RIGHT_HANDED_Y_UP; // OpenGL's coordinate system is right_handed
     init_parameters.coordinate_units = UNIT::MILLIMETER;
     init_parameters.sdk_verbose = 1;
@@ -273,6 +298,7 @@ int main(int argc, char **argv) {
             // clear the 3D bounding box list
             objects.object_list.clear();
             viewer.updateData(filtered_point_cloud, objects, skeletons, transform);
+            savePCD(filtered_point_cloud, "Captured_Pointcloud.pcd");
 #endif  // ENABLE_GUI
 
             if (is_playback && zed.getSVOPosition() == zed.getSVONumberOfFrames())
