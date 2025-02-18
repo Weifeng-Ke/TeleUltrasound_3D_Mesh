@@ -1,3 +1,0 @@
-D:/New_Uni_Life/Year_4/Term_1/ELEC_491/Point_cloud/cpp/build/CMakeFiles/ZED_concurrent_detections.dir
-D:/New_Uni_Life/Year_4/Term_1/ELEC_491/Point_cloud/cpp/build/CMakeFiles/ALL_BUILD.dir
-D:/New_Uni_Life/Year_4/Term_1/ELEC_491/Point_cloud/cpp/build/CMakeFiles/ZERO_CHECK.dir
