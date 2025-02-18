@@ -1,11 +1,10 @@
-# ZED SDK - Multi Instance Object Detection
+#Tele-Ultrasound
 
-## This sample shows how to detect and track objects in space as well as body tracking
-
+##Purpose: Helping expert navigate ultrasound scaninng at remote places by offering them a real time point cloud of the patient.
+ 
+ 
 ### Features
  - The camera point cloud is displayed in a 3D OpenGL view
- - 3D bounding boxes and human skeletons around detected objects are drawn
- - Objects classes and confidences can be changed
-
-
->*NOTE: The ZED v1 is not compatible with this module*
+ - 2D bounding boxes are used to filter out objects that's not the patient
+ - Identifying Patient in real time
+ - Produce Mesh file in .ply format by pressing the 's' key.
