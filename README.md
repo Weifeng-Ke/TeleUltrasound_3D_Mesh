@@ -1,6 +1,6 @@
-###Tele-Ultrasound
+# Tele-Ultrasound
 
-###Purpose: Helping expert navigate ultrasound scaninng at remote places by offering them a real time point cloud of the patient.
+## Purpose: Helping expert navigate ultrasound scaninng at remote places by offering them a real time point cloud of the patient.
  
  
 ### Features
