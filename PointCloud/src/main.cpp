@@ -100,17 +100,17 @@ int main(int argc, char** argv) {
     // 2. Enable Detection Modules
     //---------------------------------------------------------------------------
     // 2.1 Enable Body Tracking module (for skeleton detection).
-    print("Skeleton Detection: Loading Module...");
-    BodyTrackingParameters body_tracking_parameters;
-    body_tracking_parameters.enable_tracking = true;
-    body_tracking_parameters.enable_segmentation = true; // (Skeleton data available but will not be used)
-    body_tracking_parameters.detection_model = BODY_TRACKING_MODEL::HUMAN_BODY_MEDIUM;
-    returned_state = zed.enableBodyTracking(body_tracking_parameters);
-    if (returned_state != ERROR_CODE::SUCCESS) {
-        print("enableBodyTracking", returned_state, "\nExit program.");
-        zed.close();
-        return EXIT_FAILURE;
-    }
+    //print("Skeleton Detection: Loading Module...");
+    //BodyTrackingParameters body_tracking_parameters;
+    //body_tracking_parameters.enable_tracking = true;
+    //body_tracking_parameters.enable_segmentation = true; // (Skeleton data available but will not be used)
+    //body_tracking_parameters.detection_model = BODY_TRACKING_MODEL::HUMAN_BODY_MEDIUM;
+    //returned_state = zed.enableBodyTracking(body_tracking_parameters);
+    //if (returned_state != ERROR_CODE::SUCCESS) {
+    //    print("enableBodyTracking", returned_state, "\nExit program.");
+    //    zed.close();
+    //    return EXIT_FAILURE;
+    //}
 
     // 2.2 Enable Object Detection module (for 2D bounding boxes).
     ObjectDetectionParameters object_detection_parameters;
@@ -151,7 +151,8 @@ int main(int argc, char** argv) {
 
     // Initialize the OpenGL viewer for 3D display.
     GLViewer viewer;
-    viewer.init(argc, argv, camera_parameters, body_tracking_parameters.enable_tracking);
+    //viewer.init(argc, argv, camera_parameters, body_tracking_parameters.enable_tracking);
+    viewer.init(argc, argv, camera_parameters, false);
 
 
 
@@ -232,7 +233,7 @@ int main(int argc, char** argv) {
             // body_tracking_parameters_rt.detection_confidence_threshold = body_detection_confidence;
             // returned_state = zed.retrieveBodies(skeletons, body_tracking_parameters_rt,
             //                                     body_tracking_parameters.instance_module_id);
-            skeletons.body_list.clear(); // Ensure skeleton list is empty.
+            //skeletons.body_list.clear(); // Ensure skeleton list is empty.
 
             // --- Determine Which Object to Track ---
             // If we already have a locked object, try to find it in the current detections.
@@ -314,8 +315,8 @@ int main(int argc, char** argv) {
             // The following block is commented out to reduce overhead.
             
             zed.retrieveImage(image_left, VIEW::LEFT, MEM::CPU, display_resolution);
-            render_2D(video_feed, img_scale, objects, skeletons,
-                      true, body_tracking_parameters.enable_tracking);
+            //render_2D(video_feed, img_scale, objects, skeletons,true, body_tracking_parameters.enable_tracking);
+            render_2D(video_feed, img_scale, objects, skeletons, true, false);
             std::string fpsText = "FPS: " + std::to_string(static_cast<int>(fps));
             cv::putText(video_feed, fpsText, cv::Point(20, 40),
                         cv::FONT_HERSHEY_SIMPLEX, 1, cv::Scalar(0, 255, 0), 2);
