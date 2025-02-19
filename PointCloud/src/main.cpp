@@ -296,7 +296,7 @@ int main(int argc, char** argv) {
     //---------------------------------------------------------------------------
 #if ENABLE_GUI
     viewer.exit();
-    //filtered_point_cloud.free();
+    filtered_point_cloud.free();
     point_cloud.free();
     // image_left.free(); // (Uncomment if video feed is re-enabled)
 #endif
