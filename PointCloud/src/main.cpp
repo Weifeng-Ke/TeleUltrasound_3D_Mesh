@@ -23,10 +23,6 @@
 #include <cstring>       // For memcpy, memset
 #include <algorithm>     // For std::min, std::max
 #include <limits>        // For numeric_limits
-#include <pcl/point_types.h>
-#include <pcl/io/pcd_io.h>
-#include <pcl/point_cloud.h>
-
 
 // OpenCV includes (video feed window code is commented out below).
 #include <opencv2/opencv.hpp>
@@ -57,7 +53,6 @@ bool savefile = false;
 // Function declarations.
 void print(string msg_prefix, ERROR_CODE err_code = ERROR_CODE::SUCCESS, string msg_suffix = "");
 void parseArgs(int argc, char** argv, InitParameters& param);
-void saveFilteredPointCloudToPCD(const sl::Mat& filtered_point_cloud, const std::string& filename);
 
 int main(int argc, char** argv) {
 #ifdef _SL_JETSON_
@@ -90,7 +85,6 @@ int main(int argc, char** argv) {
     }
 
     // Enable positional tracking.
-    auto camera_config = zed.getCameraInformation().camera_configuration;
     PositionalTrackingParameters positional_tracking_parameters;
     // Optionally set as static:
     // positional_tracking_parameters.set_as_static = true;
@@ -233,26 +227,6 @@ int main(int argc, char** argv) {
             // returned_state = zed.retrieveBodies(skeletons, body_tracking_parameters_rt,
             //                                     body_tracking_parameters.instance_module_id);
             skeletons.body_list.clear(); // Ensure skeleton list is empty.
-
-            // --- Determine Which Object to Track ---
-            // If we already have a locked object, try to find it in the current detections.
-            bool foundLocked = false;
-            sl::ObjectData lockedObject; // (Assuming objects in object_list are of type ObjectData)
-            for (auto& obj : objects.object_list) {
-                if (obj.id == locked_object_id) {
-                    lockedObject = obj;
-                    foundLocked = true;
-                    break;
-                }
-            }
-            // If no locked object is found but there is at least one detection,
-            // lock onto the first detected object.
-            if (!foundLocked && !objects.object_list.empty()) {
-                // (Optional: iterate until you find one with the PERSON label)
-                locked_object_id = objects.object_list[0].id;
-                lockedObject = objects.object_list[0];
-                foundLocked = true;
-            }
 
 
 #if ENABLE_GUI
