@@ -9,20 +9,26 @@ if cloud.is_empty():
 else:
     print("Load Success")
 
-    cloud_tree = o3d.geometry.KDTreeFlann(cloud)
+    cloud_tree = o3d.geometry.KDTreeFlann(cloud) #
     distances = []
 
     for point in cloud.points:
         _, idx, dists = cloud_tree.search_knn_vector_3d(point, knn=2)  # knn=2 to get the first neighbor
         distances.append(np.sqrt(dists[1]))  # Distance to nearest neighbor
 
-    avg_spacing = np.mean(distances)
+    avg_spacing = np.mean(distances) # Gets average spacing between points in the mesh
 
-    cloud.estimate_normals(search_param=o3d.geometry.KDTreeSearchParamHybrid(radius=avg_spacing*3, max_nn=30))
-    cloud.orient_normals_consistent_tangent_plane(k=100)
+    cloud.estimate_normals(search_param=o3d.geometry.KDTreeSearchParamHybrid(radius=avg_spacing*3, max_nn=30)) # Creates normals for mesh based on average spacing
+    cloud.orient_normals_consistent_tangent_plane(k=100) # Ensures all normals are facing the same direction
+    
+    # Temp code to flip all normals:
+    #cloud.normals = o3d.utility.Vector3dVector(-np.asarray(cloud.normals))
+
+    # To-Do: Sometimes the normals are flipped (ie. Facing inwards). Add code to ensure normals all face outwards as desired
+
     print("Normal Success")
 
-    radii = o3d.utility.DoubleVector([avg_spacing * 2, avg_spacing * 2.5, avg_spacing * 3])
+    radii = o3d.utility.DoubleVector([avg_spacing * 2, avg_spacing * 2.5, avg_spacing * 3]) 
 
     mesh = o3d.geometry.TriangleMesh.create_from_point_cloud_ball_pivoting(cloud, o3d.utility.DoubleVector(radii))
 
@@ -32,12 +38,12 @@ else:
         print("Empty Mesh")
     else:
         if len(mesh.triangles) != 0:
-            success = o3d.io.write_triangle_mesh("generated_mesh.ply", mesh)
+            success = o3d.io.write_triangle_mesh("generated_mesh.ply", mesh)  # To-Do: Determine where to output mesh files
             if success:
                 print("Mesh Saved")
             else:
                 print("Failed to save")
-            o3d.visualization.draw_geometries([mesh], window_name="Gen Mesh")
+            o3d.visualization.draw_geometries([mesh], window_name="Gen Mesh") # Open3D Mesh Visualizer, remove in release
         else:
             print("Mesh has no triangles")
     
