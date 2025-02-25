@@ -23,7 +23,7 @@
 #include <cstring>       // For memcpy, memset
 #include <algorithm>     // For std::min, std::max
 #include <limits>        // For numeric_limits
-#include <cmath>
+
 // OpenCV includes (video feed window code is commented out below).
 #include <opencv2/opencv.hpp>
 
@@ -70,7 +70,7 @@ int main(int argc, char** argv) {
     InitParameters init_parameters;
     init_parameters.depth_mode = DEPTH_MODE::NEURAL; // Use NEURAL depth mode.
     init_parameters.depth_minimum_distance = 0.2f * 1000.0f;
-    init_parameters.depth_maximum_distance = 2.0f * 1000.0f;
+    init_parameters.depth_maximum_distance = 1.0f * 1000.0f;
     init_parameters.coordinate_system = COORDINATE_SYSTEM::RIGHT_HANDED_Y_UP;
     init_parameters.coordinate_units = UNIT::MILLIMETER;
     init_parameters.sdk_verbose = 1;
@@ -94,13 +94,25 @@ int main(int argc, char** argv) {
     //---------------------------------------------------------------------------
     // 2. Enable Detection Modules
     //---------------------------------------------------------------------------
-    // 2.1 Enable Object Detection module (for 2D bounding boxes).
+    // 2.1 Enable Body Tracking module (for skeleton detection).
+    print("Skeleton Detection: Loading Module...");
+    BodyTrackingParameters body_tracking_parameters;
+    body_tracking_parameters.enable_tracking = true;
+    body_tracking_parameters.enable_segmentation = true; // (Skeleton data available but will not be used)
+    body_tracking_parameters.detection_model = BODY_TRACKING_MODEL::HUMAN_BODY_MEDIUM;
+    returned_state = zed.enableBodyTracking(body_tracking_parameters);
+    if (returned_state != ERROR_CODE::SUCCESS) {
+        print("enableBodyTracking", returned_state, "\nExit program.");
+        zed.close();
+        return EXIT_FAILURE;
+    }
+
+    // 2.2 Enable Object Detection module (for 2D bounding boxes).
     ObjectDetectionParameters object_detection_parameters;
     object_detection_parameters.enable_tracking = true;
-    object_detection_parameters.enable_segmentation = true;
+    object_detection_parameters.enable_segmentation = false;
     object_detection_parameters.detection_model = OBJECT_DETECTION_MODEL::MULTI_CLASS_BOX_MEDIUM;
-    object_detection_parameters.instance_module_id = 0;
-	
+    object_detection_parameters.instance_module_id = 1;
     print("Object Detection: Loading Module...");
     returned_state = zed.enableObjectDetection(object_detection_parameters);
     if (returned_state != ERROR_CODE::SUCCESS) {
@@ -110,9 +122,10 @@ int main(int argc, char** argv) {
     }
 
     // Runtime thresholds.
-    int detection_confidence_od = 65; // For object detection.
+    int detection_confidence_od = 90; // For object detection.
     ObjectDetectionRuntimeParameters detection_parameters_rt(detection_confidence_od);
-    detection_parameters_rt.object_class_filter = { OBJECT_CLASS::PERSON };
+    int body_detection_confidence = 60; // For body tracking.
+    BodyTrackingRuntimeParameters body_tracking_parameters_rt(body_detection_confidence);
 
     //---------------------------------------------------------------------------
     // 3. Setup GUI Components and Allocate Memory (for 3D viewer only)
@@ -133,13 +146,11 @@ int main(int argc, char** argv) {
 
     // Initialize the OpenGL viewer for 3D display.
     GLViewer viewer;
-    viewer.init(argc, argv, camera_parameters, false);
-
-
+    viewer.init(argc, argv, camera_parameters, body_tracking_parameters.enable_tracking);
 
     // The following code creates the video feed window.
     // It is commented out to reduce overhead.
-
+    /*
     // Compute display resolution (maintaining aspect ratio) for the video feed.
     float image_aspect_ratio = camera_config.resolution.width / (1.f * camera_config.resolution.height);
     int requested_video_w = min(1280, (int)camera_config.resolution.width);
@@ -151,25 +162,25 @@ int main(int argc, char** argv) {
     Mat image_left(display_resolution, MAT_TYPE::U8_C4, video_feed.data, video_feed.step);
     // Calculate scale factor for overlay purposes.
     sl::float2 img_scale(display_resolution.width / (float)camera_config.resolution.width,
-        display_resolution.height / (float)camera_config.resolution.height);
+                          display_resolution.height / (float)camera_config.resolution.height);
     // Create a window that shows the video feed.
     string window_name = "ZED | Video Feed";
     cv::namedWindow(window_name, cv::WINDOW_AUTOSIZE);
-
+    */
 #endif
 
     //---------------------------------------------------------------------------
     // 4. Setup Runtime Parameters for Grab and Define Variables
     //---------------------------------------------------------------------------
     RuntimeParameters runtime_parameters;
-    runtime_parameters.confidence_threshold = 65;
+    runtime_parameters.confidence_threshold = 90;
     runtime_parameters.measure3D_reference_frame = REFERENCE_FRAME::WORLD;
 
     Pose cam_w_pose;
     cam_w_pose.pose_data.setIdentity();
 
     // Containers for detection results.
-	Objects objects;  // This will conatin the detected objects
+    Objects objects;
     Bodies skeletons;  // This will remain empty so that no skeleton is shown.
 
     bool quit = false;
@@ -200,86 +211,92 @@ int main(int argc, char** argv) {
             fps = 1000.0f / deltaTime;
             t_prev = t_now;
             // Print the FPS to the console.
-            cout << "FPS: " << static_cast<int>(fps) << "\n" << flush;
+            cout << "FPS: " << static_cast<int>(fps) << "\r" << flush;
 
             // --- Retrieve Detection Results ---
             detection_parameters_rt.detection_confidence_threshold = detection_confidence_od;
             returned_state = zed.retrieveObjects(objects, detection_parameters_rt,
                 object_detection_parameters.instance_module_id);
 
-            
+            // Disable skeleton retrieval by not calling retrieveBodies.
+            // Commenting out the following lines means skeletons will remain empty.
+            // body_tracking_parameters_rt.detection_confidence_threshold = body_detection_confidence;
+            // returned_state = zed.retrieveBodies(skeletons, body_tracking_parameters_rt,
+            //                                     body_tracking_parameters.instance_module_id);
+            skeletons.body_list.clear(); // Ensure skeleton list is empty.
 
 #if ENABLE_GUI
-            auto t_filter_start = std::chrono::high_resolution_clock::now();
-           
+            // --- Compute the 2D Bounding Box from Object Detection ---
+            float union_min_x = std::numeric_limits<float>::max();
+            float union_min_y = std::numeric_limits<float>::max();
+            float union_max_x = 0;
+            float union_max_y = 0;
+            bool valid_bbox = false;
+            for (auto& obj : objects.object_list) {
+                for (auto& pt : obj.bounding_box_2d) {
+                    union_min_x = std::min<float>(union_min_x, pt.x);
+                    union_min_y = std::min<float>(union_min_y, pt.y);
+                    union_max_x = std::max<float>(union_max_x, pt.x);
+                    union_max_y = std::max<float>(union_max_y, pt.y);
+                    valid_bbox = true;
+                }
+            }
+            if (!valid_bbox) {
+                // If no objects detected, use full image bounds.
+                union_min_x = 0;
+                union_min_y = 0;
+                union_max_x = camera_config.resolution.width;
+                union_max_y = camera_config.resolution.height;
+            }
+
+            // Convert the bounding box from camera resolution to point cloud resolution.
+            float scaleX = static_cast<float>(pc_resolution.width) / static_cast<float>(camera_config.resolution.width);
+            float scaleY = static_cast<float>(pc_resolution.height) / static_cast<float>(camera_config.resolution.height);
+            int pc_bbox_min_x = std::max<int>(0, static_cast<int>(union_min_x * scaleX));
+            int pc_bbox_min_y = std::max<int>(0, static_cast<int>(union_min_y * scaleY));
+            int pc_bbox_max_x = std::min<int>(pc_resolution.width - 1, static_cast<int>(union_max_x * scaleX));
+            int pc_bbox_max_y = std::min<int>(pc_resolution.height - 1, static_cast<int>(union_max_y * scaleY));
+
             // --- Retrieve the Full Point Cloud ---
             zed.retrieveMeasure(point_cloud, MEASURE::XYZRGBA, MEM::CPU, pc_resolution);
-            // Convert the sl::Mat mask to a cv::Mat using the utility function.
-            cv::Mat mask_cv = slMat2cvMat(objects.object_list[0].mask);
-            // Resize the mask to match the point cloud resolution (using nearest-neighbor interpolation to preserve binary values). 
-            cv::Mat resized_mask_cv;
-            cv::resize(mask_cv, resized_mask_cv, cv::Size(point_cloud.getWidth(), point_cloud.getHeight()), 0, 0, cv::INTER_NEAREST);
-           
 
-
-            int width = point_cloud.getWidth();
-            int height = point_cloud.getHeight();
-
-            // Loop through each pixel in the full point cloud.
-            for (int y = 0; y < height; ++y) {
-                for (int x = 0; x < width; ++x) {
-                    // Retrieve the current point from the full point cloud.
-                    sl::float4 point;
-                    point_cloud.getValue<sl::float4>(x, y, &point, sl::MEM::CPU);
-
-                    // Retrieve the corresponding mask value.
-                    // (Assuming the mask is stored as a single-channel 8-bit image.)
-                    uchar maskValue = 0;
-                    maskValue = resized_mask_cv.at<uchar>(y, x);
-
-                    if (maskValue > 50) {
-                        // If the mask is active (nonzero), keep the original point.
-                        filtered_point_cloud.setValue<sl::float4>(x, y, point, sl::MEM::CPU);
-                    }
-                    else {
-                        // Otherwise, set the point to an invalid value (e.g., NAN) so it won't be rendered.
-                        filtered_point_cloud.setValue<sl::float4>(x, y, sl::float4(NAN,NAN, NAN, NAN), sl::MEM::CPU);
+            // --- Filter the Point Cloud Using the 2D Bounding Box (Optimized) ---
+            // Clear the entire filtered point cloud buffer.
+            memset(filtered_point_cloud.getPtr<sl::float4>(MEM::CPU), 0,
+                pc_resolution.width * pc_resolution.height * sizeof(sl::float4));
+            // Only process the region inside the computed bounding box.
+#pragma omp parallel for collapse(2)
+            for (int py = pc_bbox_min_y; py <= pc_bbox_max_y; ++py) {
+                for (int px = pc_bbox_min_x; px <= pc_bbox_max_x; ++px) {
+                    sl::float4 pcValue;
+                    point_cloud.getValue<sl::float4>(px, py, &pcValue, MEM::CPU);
+                    if (std::isnormal(pcValue.z)) {
+                        filtered_point_cloud.setValue<sl::float4>(px, py, pcValue, MEM::CPU);
                     }
                 }
             }
             filtered_point_cloud.updateGPUfromCPU();
 
-            // --- 2D Overlay Rendering for Video Feed ---
+            // --- (Optional) 2D Overlay Rendering for Video Feed ---
             // The following block is commented out to reduce overhead.
-
+            /*
             zed.retrieveImage(image_left, VIEW::LEFT, MEM::CPU, display_resolution);
             render_2D(video_feed, img_scale, objects, skeletons,
-                true,false);
+                      true, body_tracking_parameters.enable_tracking);
             std::string fpsText = "FPS: " + std::to_string(static_cast<int>(fps));
             cv::putText(video_feed, fpsText, cv::Point(20, 40),
-                cv::FONT_HERSHEY_SIMPLEX, 1, cv::Scalar(0, 255, 0), 2);
+                        cv::FONT_HERSHEY_SIMPLEX, 1, cv::Scalar(0, 255, 0), 2);
             cv::imshow(window_name, video_feed);
             char key = cv::waitKey(10);
             if (key == 'q') {
                 quit = true;
             }
-
+            */
 
             // --- 3D Viewer Update ---
-            //zed.getPosition(cam_w_pose, REFERENCE_FRAME::WORLD);
-            sl::Transform transform;
-            transform.setIdentity();
-            // clear the 3D bounding box list
-            objects.object_list.clear();
+            zed.getPosition(cam_w_pose, REFERENCE_FRAME::WORLD);
             // Pass the (empty) skeletons so that no skeleton is shown.
-            //viewer.updateData(filtered_point_cloud, objects, skeletons, cam_w_pose.pose_data);
-            //viewer.updateData(point_cloud, objects, skeletons, transform);
-            // Display the filtered point cloud in the viewer.
-            viewer.updateData(filtered_point_cloud, objects, skeletons, transform);
-
-            auto t_filter_end = std::chrono::high_resolution_clock::now();
-            float filter_time = std::chrono::duration<float, std::milli>(t_filter_end - t_filter_start).count();
-			cout << "Filtering Time: " << filter_time << " ms\n" << flush;
+            viewer.updateData(filtered_point_cloud, objects, skeletons, cam_w_pose.pose_data);
 #endif  // ENABLE_GUI
 
             if (is_playback && zed.getSVOPosition() == zed.getSVONumberOfFrames())
