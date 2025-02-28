@@ -8,6 +8,7 @@
 //      coordinates lie inside that 2D box are kept (preserving the native color).
 //   3. Display the filtered point cloud in the 3D viewer.
 //   4. Print the FPS (frames per second) to the console.
+//   5. Save the filtered point cloud to a file.
 // 
 // Performance improvements include clearing the output buffer once,
 // restricting processing to the region of interest, and using OpenMP to
@@ -24,6 +25,10 @@
 #include <algorithm>     // For std::min, std::max
 #include <limits>        // For numeric_limits
 #include <cmath>
+#include <pcl/io/pcd_io.h>
+#include <pcl/point_cloud.h>
+#include <pcl/point_types.h>
+
 // OpenCV includes (video feed window code is commented out below).
 #include <opencv2/opencv.hpp>
 
@@ -200,18 +205,28 @@ int main(int argc, char** argv) {
             fps = 1000.0f / deltaTime;
             t_prev = t_now;
             // Print the FPS to the console.
-            cout << "FPS: " << static_cast<int>(fps) << "\n" << flush;
+            std::cout << "FPS: " << static_cast<int>(fps) << "\n" << flush;
 
             // --- Retrieve Detection Results ---
             detection_parameters_rt.detection_confidence_threshold = detection_confidence_od;
             returned_state = zed.retrieveObjects(objects, detection_parameters_rt,
                 object_detection_parameters.instance_module_id);
 
-            
-
+            sl::float3 personPos = objects.object_list[0].position;
+			std::vector<sl::float3>bbox3d = objects.object_list[0].bounding_box;
+            float z_min = -std::numeric_limits<float>::min();
+            float z_max = -std::numeric_limits<float>::max();
+            for (size_t i = 0; i < bbox3d.size(); i++) {
+                if (bbox3d[i].z < z_min) z_min = bbox3d[i].z;
+                if (bbox3d[i].z > z_max) z_max = bbox3d[i].z;
+            }
+            // Define a tolerance (in millimeters, adjust as needed)
+            float zTolerance = 500.0f;
+            z_min -= zTolerance;
+            z_max += zTolerance;
 #if ENABLE_GUI
             auto t_filter_start = std::chrono::high_resolution_clock::now();
-           
+
             // --- Retrieve the Full Point Cloud ---
             zed.retrieveMeasure(point_cloud, MEASURE::XYZRGBA, MEM::CPU, pc_resolution);
             // Convert the sl::Mat mask to a cv::Mat using the utility function.
@@ -219,8 +234,6 @@ int main(int argc, char** argv) {
             // Resize the mask to match the point cloud resolution (using nearest-neighbor interpolation to preserve binary values). 
             cv::Mat resized_mask_cv;
             cv::resize(mask_cv, resized_mask_cv, cv::Size(point_cloud.getWidth(), point_cloud.getHeight()), 0, 0, cv::INTER_NEAREST);
-           
-
 
             int width = point_cloud.getWidth();
             int height = point_cloud.getHeight();
@@ -233,17 +246,17 @@ int main(int argc, char** argv) {
                     point_cloud.getValue<sl::float4>(x, y, &point, sl::MEM::CPU);
 
                     // Retrieve the corresponding mask value.
-                    // (Assuming the mask is stored as a single-channel 8-bit image.)
+                    // (the mask is stored as a single-channel 8-bit image.8UC1)
                     uchar maskValue = 0;
                     maskValue = resized_mask_cv.at<uchar>(y, x);
 
-                    if (maskValue > 50) {
+                    if (maskValue > 0 && (point.z >= z_min && point.z <= z_max)) {
                         // If the mask is active (nonzero), keep the original point.
                         filtered_point_cloud.setValue<sl::float4>(x, y, point, sl::MEM::CPU);
                     }
                     else {
                         // Otherwise, set the point to an invalid value (e.g., NAN) so it won't be rendered.
-                        filtered_point_cloud.setValue<sl::float4>(x, y, sl::float4(NAN,NAN, NAN, NAN), sl::MEM::CPU);
+                        filtered_point_cloud.setValue<sl::float4>(x, y, sl::float4(NAN, NAN, NAN, NAN), sl::MEM::CPU);
                     }
                 }
             }
@@ -254,32 +267,39 @@ int main(int argc, char** argv) {
 
             zed.retrieveImage(image_left, VIEW::LEFT, MEM::CPU, display_resolution);
             render_2D(video_feed, img_scale, objects, skeletons,
-                true,false);
+                true, false);
             std::string fpsText = "FPS: " + std::to_string(static_cast<int>(fps));
             cv::putText(video_feed, fpsText, cv::Point(20, 40),
                 cv::FONT_HERSHEY_SIMPLEX, 1, cv::Scalar(0, 255, 0), 2);
             cv::imshow(window_name, video_feed);
-            char key = cv::waitKey(10);
+            char key = cv::waitKey(20);
             if (key == 'q') {
                 quit = true;
+			}
+            else if (key == 's') {
+                //sl::Mat filtered_point_cloud;
+                zed.retrieveMeasure(filtered_point_cloud, MEASURE::XYZRGBA);
+                auto write_suceed = filtered_point_cloud.write("Filtered_Pointcloud.ply");
+                if (write_suceed == sl::ERROR_CODE::SUCCESS)
+                    std::cout << "Current filtered_point_cloud.ply file saving succeed" << std::endl;
+                else
+                    std::cout << "Current filtered_point_cloud.ply file saving failed" << std::endl;
+
             }
-
-
             // --- 3D Viewer Update ---
             //zed.getPosition(cam_w_pose, REFERENCE_FRAME::WORLD);
             sl::Transform transform;
             transform.setIdentity();
             // clear the 3D bounding box list
             objects.object_list.clear();
-            // Pass the (empty) skeletons so that no skeleton is shown.
-            //viewer.updateData(filtered_point_cloud, objects, skeletons, cam_w_pose.pose_data);
+            
             //viewer.updateData(point_cloud, objects, skeletons, transform);
             // Display the filtered point cloud in the viewer.
             viewer.updateData(filtered_point_cloud, objects, skeletons, transform);
 
             auto t_filter_end = std::chrono::high_resolution_clock::now();
             float filter_time = std::chrono::duration<float, std::milli>(t_filter_end - t_filter_start).count();
-			cout << "Filtering Time: " << filter_time << " ms\n" << flush;
+			std::cout << "Filtering Time: " << filter_time << " ms\n" << flush;
 #endif  // ENABLE_GUI
 
             if (is_playback && zed.getSVOPosition() == zed.getSVONumberOfFrames())
