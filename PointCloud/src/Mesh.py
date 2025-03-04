@@ -21,14 +21,24 @@ else:
     cloud.estimate_normals(search_param=o3d.geometry.KDTreeSearchParamHybrid(radius=avg_spacing*3, max_nn=30)) # Creates normals for mesh based on average spacing
     cloud.orient_normals_consistent_tangent_plane(k=100) # Ensures all normals are facing the same direction
     
-    # Temp code to flip all normals:
-    #cloud.normals = o3d.utility.Vector3dVector(-np.asarray(cloud.normals))
 
-    # To-Do: Sometimes the normals are flipped (ie. Facing inwards). Add code to ensure normals all face outwards as desired
+    # Tries to find the center of all the points and mark it as the "interior"
+    # Aligns all normals so that they face away from the centroid
+    # **Note** Unreliable due to noise/random points, the issue of flipped normals might have to be fixed by rendering them double sided
+    centroid = np.mean(np.asarray(cloud.points), axis = 0)
+
+    normals = np.asarray(cloud.normals)
+    vectors_to_centroid = np.asarray(cloud.points) - centroid
+    dot_products = np.einsum("ij,ij->i", normals, vectors_to_centroid)
+
+    if np.mean(dot_products) < 0:
+        cloud.normals = o3d.utility.Vector3dVector(-normals)
+
 
     print("Normal Success")
 
-    radii = o3d.utility.DoubleVector([avg_spacing * 2, avg_spacing * 2.5, avg_spacing * 3]) 
+    # From testing, seems to be the best set of radii for minimizing holes. More radii has minimal effect on mesh creation speed. 
+    radii = o3d.utility.DoubleVector([avg_spacing * 3, avg_spacing * 3.5, avg_spacing *4, avg_spacing * 4.5, avg_spacing * 5, avg_spacing * 5.5, avg_spacing *6, avg_spacing * 20])
 
     mesh = o3d.geometry.TriangleMesh.create_from_point_cloud_ball_pivoting(cloud, o3d.utility.DoubleVector(radii))
 
