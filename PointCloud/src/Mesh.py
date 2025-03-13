@@ -4,7 +4,10 @@ import numpy as np
 
 # cloud = o3d.io.read_point_cloud("[pointcloudname].ply") #TO-DO Add way to read pointcloud files automatically
 
-cloud = o3d.io.read_point_cloud("Pointcloud_top_down.ply")
+cloud = o3d.io.read_point_cloud("TopDown.ply")
+
+cloud = cloud.voxel_down_sample(voxel_size = 0.02)
+
 
 if cloud.is_empty():
     print("Load Failed")
