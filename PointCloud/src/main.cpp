@@ -122,7 +122,7 @@ int main(int argc, char** argv) {
     }
 
     // Runtime thresholds.
-    int detection_confidence_od = 90; // For object detection.
+    int detection_confidence_od = 80; // For object detection.
     ObjectDetectionRuntimeParameters detection_parameters_rt(detection_confidence_od);
     int body_detection_confidence = 60; // For body tracking.
     BodyTrackingRuntimeParameters body_tracking_parameters_rt(body_detection_confidence);
@@ -150,7 +150,7 @@ int main(int argc, char** argv) {
 
     // The following code creates the video feed window.
     // It is commented out to reduce overhead.
-    /*
+    
     // Compute display resolution (maintaining aspect ratio) for the video feed.
     float image_aspect_ratio = camera_config.resolution.width / (1.f * camera_config.resolution.height);
     int requested_video_w = min(1280, (int)camera_config.resolution.width);
@@ -166,14 +166,14 @@ int main(int argc, char** argv) {
     // Create a window that shows the video feed.
     string window_name = "ZED | Video Feed";
     cv::namedWindow(window_name, cv::WINDOW_AUTOSIZE);
-    */
+    
 #endif
 
     //---------------------------------------------------------------------------
     // 4. Setup Runtime Parameters for Grab and Define Variables
     //---------------------------------------------------------------------------
     RuntimeParameters runtime_parameters;
-    runtime_parameters.confidence_threshold = 90;
+    runtime_parameters.confidence_threshold = 80;
     runtime_parameters.measure3D_reference_frame = REFERENCE_FRAME::WORLD;
 
     Pose cam_w_pose;
@@ -211,7 +211,7 @@ int main(int argc, char** argv) {
             fps = 1000.0f / deltaTime;
             t_prev = t_now;
             // Print the FPS to the console.
-            cout << "FPS: " << static_cast<int>(fps) << "\r" << flush;
+            cout << "FPS: " << static_cast<int>(fps) << "\n" << flush;
 
             // --- Retrieve Detection Results ---
             detection_parameters_rt.detection_confidence_threshold = detection_confidence_od;
@@ -262,7 +262,7 @@ int main(int argc, char** argv) {
 
             // --- Filter the Point Cloud Using the 2D Bounding Box (Optimized) ---
             // Clear the entire filtered point cloud buffer.
-            memset(filtered_point_cloud.getPtr<sl::float4>(MEM::CPU), 0,
+            memset(filtered_point_cloud.getPtr<sl::float4>(MEM::CPU), NAN,
                 pc_resolution.width * pc_resolution.height * sizeof(sl::float4));
             // Only process the region inside the computed bounding box.
 #pragma omp parallel for collapse(2)
@@ -279,22 +279,35 @@ int main(int argc, char** argv) {
 
             // --- (Optional) 2D Overlay Rendering for Video Feed ---
             // The following block is commented out to reduce overhead.
-            /*
+            
             zed.retrieveImage(image_left, VIEW::LEFT, MEM::CPU, display_resolution);
             render_2D(video_feed, img_scale, objects, skeletons,
                       true, body_tracking_parameters.enable_tracking);
             std::string fpsText = "FPS: " + std::to_string(static_cast<int>(fps));
             cv::putText(video_feed, fpsText, cv::Point(20, 40),
                         cv::FONT_HERSHEY_SIMPLEX, 1, cv::Scalar(0, 255, 0), 2);
-            cv::imshow(window_name, video_feed);
-            char key = cv::waitKey(10);
+            cv::imshow(window_name, video_feed);  
+            char key = cv::waitKey(20);
             if (key == 'q') {
                 quit = true;
             }
-            */
+            else if (key == 's') {
+                //sl::Mat filtered_point_cloud;
+                zed.retrieveMeasure(filtered_point_cloud, MEASURE::XYZRGBA);
+                auto write_suceed = filtered_point_cloud.write("Filtered_Pointcloud.ply");
+                if (write_suceed == sl::ERROR_CODE::SUCCESS)
+                    std::cout << "Current filtered_point_cloud.ply file saving succeed" << std::endl;
+                else
+                    std::cout << "Current filtered_point_cloud.ply file saving failed" << std::endl;
+            }
+
 
             // --- 3D Viewer Update ---
-            zed.getPosition(cam_w_pose, REFERENCE_FRAME::WORLD);
+            //zed.getPosition(cam_w_pose, REFERENCE_FRAME::WORLD);
+            sl::Transform transform;
+            transform.setIdentity();
+            // clear the 3D bounding box list
+            objects.object_list.clear();
             // Pass the (empty) skeletons so that no skeleton is shown.
             viewer.updateData(filtered_point_cloud, objects, skeletons, cam_w_pose.pose_data);
 #endif  // ENABLE_GUI
