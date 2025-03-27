@@ -226,6 +226,7 @@ int main(int argc, char** argv) {
             skeletons.body_list.clear(); // Ensure skeleton list is empty.
 
 #if ENABLE_GUI
+            auto t_filter_start = std::chrono::high_resolution_clock::now();
             // --- Compute the 2D Bounding Box from Object Detection ---
             float union_min_x = std::numeric_limits<float>::max();
             float union_min_y = std::numeric_limits<float>::max();
@@ -310,6 +311,9 @@ int main(int argc, char** argv) {
             objects.object_list.clear();
             // Pass the (empty) skeletons so that no skeleton is shown.
             viewer.updateData(filtered_point_cloud, objects, skeletons, cam_w_pose.pose_data);
+            auto t_filter_end = std::chrono::high_resolution_clock::now();
+            float filter_time = std::chrono::duration<float, std::milli>(t_filter_end - t_filter_start).count();
+            std::cout << "Latency Time: " << filter_time << " ms\n" << flush;
 #endif  // ENABLE_GUI
 
             if (is_playback && zed.getSVOPosition() == zed.getSVONumberOfFrames())
