@@ -70,7 +70,7 @@ int main(int argc, char** argv) {
     InitParameters init_parameters;
     init_parameters.depth_mode = DEPTH_MODE::NEURAL; // Use NEURAL depth mode.
     init_parameters.depth_minimum_distance = 0.2f * 1000.0f;
-    init_parameters.depth_maximum_distance = 1.0f * 1000.0f;
+    init_parameters.depth_maximum_distance = 0.5f * 1000.0f;
     init_parameters.coordinate_system = COORDINATE_SYSTEM::RIGHT_HANDED_Y_UP;
     init_parameters.coordinate_units = UNIT::MILLIMETER;
     init_parameters.sdk_verbose = 1;
