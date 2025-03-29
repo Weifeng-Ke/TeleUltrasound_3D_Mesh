@@ -2,8 +2,7 @@ import open3d as o3d
 import os
 import numpy as np
 
-cloud = o3d.io.read_point_cloud("PointCloud\\build\\Filtered_Pointcloud.ply") #TO-DO Add way to read pointcloud files automatically
-
+cloud = o3d.io.read_point_cloud("PointCloud\\build\\Filtered_Pointcloud.ply")
 cloud = cloud.voxel_down_sample(voxel_size = 3)
 
 if cloud.is_empty():
