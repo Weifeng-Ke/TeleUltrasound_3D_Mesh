@@ -18,6 +18,7 @@ find_package(GLUT REQUIRED)
 find_package(GLEW REQUIRED)
 SET(OpenGL_GL_PREFERENCE GLVND)
 find_package(OpenGL REQUIRED)
+find_package(pybind11 REQUIRED)
 
 # --- Add PCL here ---
 find_package(PCL REQUIRED)
@@ -60,6 +61,7 @@ target_link_libraries(${PROJECT_NAME}
                         ${GLEW_LIBRARIES}
                         ${OpenCV_LIBRARIES}
                         ${PCL_LIBRARIES}
+                        pybind11::module
                         )
 
 if(INSTALL_SAMPLES)

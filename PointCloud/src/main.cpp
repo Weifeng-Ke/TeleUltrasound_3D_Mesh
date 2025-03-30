@@ -23,6 +23,9 @@
 #include <cstring>       // For memcpy, memset
 #include <algorithm>     // For std::min, std::max
 #include <limits>        // For numeric_limits
+#include <cstdlib>
+#include <pybind11/pybind11.h>
+#include <pybind11/numpy.h>
 
 // OpenCV includes (video feed window code is commented out below).
 #include <opencv2/opencv.hpp>
@@ -43,6 +46,9 @@
 #ifdef _OPENMP
 #include <omp.h>
 #endif
+
+#include "main.h""
+
 
 using namespace std;
 using namespace sl;
@@ -300,6 +306,10 @@ int main(int argc, char** argv) {
                     std::cout << "Current filtered_point_cloud.ply file saving succeed" << std::endl;
                 else
                     std::cout << "Current filtered_point_cloud.ply file saving failed" << std::endl;
+
+                int result = system("py C:\\Users\\capstone\\Desktop\\ZED_Point_cloud_filtered\\PointCloud\\src\\Mesh.py");
+                std::cout << result << std::endl;
+                
             }
 
 
