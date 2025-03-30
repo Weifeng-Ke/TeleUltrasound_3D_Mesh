@@ -310,10 +310,10 @@ int main(int argc, char** argv) {
                 else
                     std::cout << "Current filtered_point_cloud.ply file saving failed" << std::endl;
 
-                int result = system("py C:\\Users\\capstone\\Desktop\\ZED_Point_cloud_filtered\\PointCloud\\src\\Mesh.py");
-                std::cout << result << std::endl;
-                
-            }
+                    int result = system("py C:\\Users\\capstone\\Desktop\\ZED_Point_cloud_filtered\\PointCloud\\src\\Mesh.py");
+                    std::cout << result << std::endl;
+
+                }
 
 
             // --- 3D Viewer Update ---
