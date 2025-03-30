@@ -47,8 +47,11 @@
 #include <omp.h>
 #endif
 
-#include "main.h""
+#include <../include/main>
 
+PYBIND11_MODULE(main, m) {
+    m.def("")
+}
 
 using namespace std;
 using namespace sl;
