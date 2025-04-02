@@ -2,46 +2,26 @@ import open3d as o3d
 import os
 import numpy as np
 import multiprocessing
-
-# Used for parallelization, currently not working
-def estimate_normals_chunk(chunk, avg_spacing):
-    print("Entered Estimate Norms")
-
-    temp_cloud = o3d.geometry.PointCloud()
-    temp_cloud.points = o3d.utility.Vector3dVector(chunk)
-
-    print(temp_cloud)
-
-    temp_cloud.estimate_normals(search_param=o3d.geometry.KDTreeSearchParamHybrid(radius=avg_spacing*3, max_nn=30))
-
-    temp_cloud.orient_normals_consistent_tangent_plane(k=5)
-
-    return np.asarray(temp_cloud.normals)
-
-def parallel_normal_estimation(cloud, avg_spacing, chunk_size = 10000):
-    print("Entered Parallel")
-
-    num_chunks = len(cloud.points) // chunk_size + 1
-    chunks = []
-    for i in range(num_chunks):
-        if (i + 1) * chunk_size > len(cloud.points):
-            chunks.append(np.asarray(cloud.points)[i * chunk_size: len(cloud.points)])
-        else:
-            chunks.append(np.asarray(cloud.points)[i * chunk_size: (i + 1) * chunk_size])
-
-    with multiprocessing.Pool(processes=multiprocessing.cpu_count()) as pool:
-        results = pool.starmap(estimate_normals_chunk, [(chunk, avg_spacing) for chunk in chunks])
-
-    all_normals = np.vstack(results)
-    cloud.normals = o3d.utility.Vector3dVector(all_normals)
-    return cloud
+import sys
 
 
-if __name__ == '__main__':
-    
-    cloud = o3d.io.read_point_cloud("PointCloud\\build\\Filtered_Pointcloud.ply")
-    
-    cloud = cloud.voxel_down_sample(voxel_size = 3)
+
+def processMesh(arr):
+
+
+    array = np.array(arr)
+
+    print(array[:,-3:])
+
+    # if __name__ == '__main__':
+    print("Current Working Directory:", os.getcwd())
+    cloud = o3d.geometry.PointCloud()
+
+    cloud.points = o3d.utility.Vector3dVector(array[:,:3])
+    cloud.colors = o3d.utility.Vector3dVector(array[:,-3:]) #todo, extract rgb values from the float
+
+    # cloud = o3d.io.read_point_cloud("PointCloud\\build\\Filtered_Pointcloud.ply", remove_nan_points=True, remove_infinite_points=True)
+
 
     if cloud.is_empty():
         print("Load Failed")
@@ -58,6 +38,8 @@ if __name__ == '__main__':
         avg_spacing = np.mean(distances) # Gets average spacing between points in the mesh
 
         print("Obtained Spacing")
+
+        cloud = cloud.voxel_down_sample(voxel_size = avg_spacing*2)
 
         # Code for running normal gen in parallel
         # cloud = parallel_normal_estimation(cloud, avg_spacing)
@@ -98,7 +80,43 @@ if __name__ == '__main__':
                     print("Mesh Saved")
                 else:
                     print("Failed to save")
-                o3d.visualization.draw_geometries([mesh], window_name="Gen Mesh") # Open3D Mesh Visualizer, remove in release
+                # o3d.visualization.draw_geometries([mesh], window_name="Gen Mesh") # Open3D Mesh Visualizer, remove in release
             else:
                 print("Mesh has no triangles")
-        
+
+
+
+# Used for parallelization, currently not working
+def estimate_normals_chunk(chunk, avg_spacing):
+    print("Entered Estimate Norms")
+
+    temp_cloud = o3d.geometry.PointCloud()
+    temp_cloud.points = o3d.utility.Vector3dVector(chunk)
+
+    print(temp_cloud)
+
+    temp_cloud.estimate_normals(search_param=o3d.geometry.KDTreeSearchParamHybrid(radius=avg_spacing*3, max_nn=30))
+
+    temp_cloud.orient_normals_consistent_tangent_plane(k=5)
+
+    return np.asarray(temp_cloud.normals)
+
+def parallel_normal_estimation(cloud, avg_spacing, chunk_size = 10000):
+    print("Entered Parallel")
+
+    num_chunks = len(cloud.points) // chunk_size + 1
+    chunks = []
+    for i in range(num_chunks):
+        if (i + 1) * chunk_size > len(cloud.points):
+            chunks.append(np.asarray(cloud.points)[i * chunk_size: len(cloud.points)])
+        else:
+            chunks.append(np.asarray(cloud.points)[i * chunk_size: (i + 1) * chunk_size])
+
+    with multiprocessing.Pool(processes=multiprocessing.cpu_count()) as pool:
+        results = pool.starmap(estimate_normals_chunk, [(chunk, avg_spacing) for chunk in chunks])
+
+    all_normals = np.vstack(results)
+    cloud.normals = o3d.utility.Vector3dVector(all_normals)
+    return cloud
+
+

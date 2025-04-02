@@ -26,6 +26,9 @@
 #include <cstdlib>
 #include <pybind11/pybind11.h>
 #include <pybind11/numpy.h>
+#include <pybind11/embed.h>
+#include <Python.h>
+//#include <open3d/Open3D.h>
 
 // OpenCV includes (video feed window code is commented out below).
 #include <opencv2/opencv.hpp>
@@ -47,11 +50,7 @@
 #include <omp.h>
 #endif
 
-#include <../include/main>
 
-PYBIND11_MODULE(main, m) {
-    m.def("")
-}
 
 using namespace std;
 using namespace sl;
@@ -62,6 +61,20 @@ bool is_playback = false;
 // Function declarations.
 void print(string msg_prefix, ERROR_CODE err_code = ERROR_CODE::SUCCESS, string msg_suffix = "");
 void parseArgs(int argc, char** argv, InitParameters& param);
+
+void initialize() {
+    Py_Initialize();
+    if (!Py_IsInitialized) {
+        std::cerr << "Initialization failed" << endl;
+        exit(1);
+    }
+    PyObject* sys_path = PySys_GetObject("path");
+    PyList_Append(sys_path, PyUnicode_FromString("C:/Users/capstone/Desktop/ZED_Point_cloud_filtered/PointCloud/src"));
+}
+
+void finalize() {
+    Py_Finalize();
+}
 
 int main(int argc, char** argv) {
 #ifdef _SL_JETSON_
@@ -79,7 +92,7 @@ int main(int argc, char** argv) {
     InitParameters init_parameters;
     init_parameters.depth_mode = DEPTH_MODE::NEURAL; // Use NEURAL depth mode.
     init_parameters.depth_minimum_distance = 0.2f * 1000.0f;
-    init_parameters.depth_maximum_distance = 2.0f * 1000.0f;
+    init_parameters.depth_maximum_distance = 0.85f * 1000.0f;
     init_parameters.coordinate_system = COORDINATE_SYSTEM::RIGHT_HANDED_Y_UP;
     init_parameters.coordinate_units = UNIT::MILLIMETER;
     init_parameters.sdk_verbose = 1;
@@ -310,11 +323,79 @@ int main(int argc, char** argv) {
                 else
                     std::cout << "Current filtered_point_cloud.ply file saving failed" << std::endl;
 
-                    int result = system("py C:\\Users\\capstone\\Desktop\\ZED_Point_cloud_filtered\\PointCloud\\src\\Mesh.py");
-                    std::cout << result << std::endl;
+                const int width = filtered_point_cloud.getWidth();
 
+                const int height = filtered_point_cloud.getHeight();
+
+                std::vector<std::vector<float>> points;
+
+                for (int y = 0; y < height; y++) {
+                    for (int x = 0; x < width; x++) {
+                        sl::float4 point;
+                        filtered_point_cloud.getValue(x, y, &point);
+
+                        uint32_t color = *reinterpret_cast<uint32_t*>(&point.w);
+
+                        float b = (color & 0x000000FF) / 255.0;
+                        float g = ((color & 0x0000FF00) >> 8 ) / 255.0;
+                        float r = ((color & 0x00FF0000) >> 16) / 255.0;
+
+
+
+                        if (point.z != 0 && !std::isinf(point.z) && !std::isnan(point.z)) {
+                            points.push_back({ point.x, point.y, point.z, b, g, r });
+                        }
+                    }
                 }
 
+                initialize();
+
+                PyObject* pyList = PyList_New(points.size());
+                for (size_t i = 0; i < points.size(); i++) {
+                    PyObject* pyPoint = PyTuple_New(6);
+                    PyTuple_SetItem(pyPoint, 0, PyFloat_FromDouble(points[i][0]));
+                    PyTuple_SetItem(pyPoint, 1, PyFloat_FromDouble(points[i][1]));
+                    PyTuple_SetItem(pyPoint, 2, PyFloat_FromDouble(points[i][2]));
+                    PyTuple_SetItem(pyPoint, 3, PyFloat_FromDouble(points[i][3]));
+                    PyTuple_SetItem(pyPoint, 4, PyFloat_FromDouble(points[i][4]));
+                    PyTuple_SetItem(pyPoint, 5, PyFloat_FromDouble(points[i][5]));
+                    PyList_SetItem(pyList, i, pyPoint); 
+                }
+
+                PyObject* pName = PyUnicode_DecodeFSDefault("wrapper");
+                PyObject* pModule = PyImport_Import(pName);
+                Py_XDECREF(pName);
+                if (!pModule) {
+                    PyErr_Print();
+                    std::cerr << "Failed to load Cython wrapper" << std::endl;
+                    finalize();
+                }
+                else {
+                    PyObject* pFunc = PyObject_GetAttrString(pModule, "call_python_function");
+                    if (PyCallable_Check(pFunc)) {
+                        PyObject* pResult = PyObject_CallFunctionObjArgs(pFunc, pyList, NULL);
+                        if (pResult) {
+                            std::cout << "Python Function returned successfully" << std::endl;
+                            Py_XDECREF(pResult);
+                        }
+                        else {
+                            PyErr_Print();
+                            std::cerr << "Failed to Call Function" << std::endl;
+                        }
+                    }
+                    else {
+                        PyErr_Print();
+                        std::cerr << "Python function not found" << std::endl;
+                    }
+
+                    Py_XDECREF(pFunc);
+                    Py_XDECREF(pModule);
+
+                    finalize();
+                }
+
+                }
+   
 
             // --- 3D Viewer Update ---
             //zed.getPosition(cam_w_pose, REFERENCE_FRAME::WORLD);
