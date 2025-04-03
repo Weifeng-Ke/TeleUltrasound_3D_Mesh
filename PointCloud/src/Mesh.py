@@ -11,14 +11,14 @@ def processMesh(arr):
 
     array = np.array(arr)
 
-    print(array[:,-3:])
+    # print(array[:,-3:])
 
     # if __name__ == '__main__':
-    print("Current Working Directory:", os.getcwd())
+    # print("Current Working Directory:", os.getcwd())
     cloud = o3d.geometry.PointCloud()
 
     cloud.points = o3d.utility.Vector3dVector(array[:,:3])
-    cloud.colors = o3d.utility.Vector3dVector(array[:,-3:]) #todo, extract rgb values from the float
+    cloud.colors = o3d.utility.Vector3dVector(array[:,-3:]) 
 
     # cloud = o3d.io.read_point_cloud("PointCloud\\build\\Filtered_Pointcloud.ply", remove_nan_points=True, remove_infinite_points=True)
 
@@ -27,6 +27,9 @@ def processMesh(arr):
         print("Load Failed")
     else:
         print("Load Success")
+
+        cloud = cloud.voxel_down_sample(voxel_size = 3)
+
 
         cloud_tree = o3d.geometry.KDTreeFlann(cloud) 
         distances = []
@@ -37,9 +40,6 @@ def processMesh(arr):
 
         avg_spacing = np.mean(distances) # Gets average spacing between points in the mesh
 
-        print("Obtained Spacing")
-
-        cloud = cloud.voxel_down_sample(voxel_size = avg_spacing*2)
 
         # Code for running normal gen in parallel
         # cloud = parallel_normal_estimation(cloud, avg_spacing)
@@ -49,20 +49,20 @@ def processMesh(arr):
 
         # cloud.orient_normals_to_align_with_direction([0,0,1])
         # cloud.orient_normals_towards_camera_location([0,0,10])
-        cloud.orient_normals_consistent_tangent_plane(k=5) # Ensures all normals are facing the same direction
+        cloud.orient_normals_consistent_tangent_plane(k=10) # Ensures all normals are facing the same direction
         
         print("Orient Success")
 
-        # centroid = np.mean(np.asarray(cloud.points), axis = 0)
+        centroid = np.mean(np.asarray(cloud.points), axis = 0)
 
-        # normals = np.asarray(cloud.normals)
-        # vectors_to_centroid = np.asarray(cloud.points) - centroid
-        # dot_prod = np.einsum("ij,ij->i", normals, vectors_to_centroid)
+        normals = np.asarray(cloud.normals)
+        vectors_to_centroid = np.asarray(cloud.points) - centroid
+        dot_prod = np.einsum("ij,ij->i", normals, vectors_to_centroid)
 
-        # if np.mean(dot_prod) < 0 :
-        #     cloud.normals = o3d.utility.Vector3dVector(-normals)
+        if np.mean(dot_prod) < 0 :
+            cloud.normals = o3d.utility.Vector3dVector(-normals)
 
-        # print("Centroid Success")
+        print("Centroid Success")
 
 
         radii = o3d.utility.DoubleVector([avg_spacing * 3, avg_spacing * 3.5, avg_spacing * 4, avg_spacing*4.5, avg_spacing*5]) 
