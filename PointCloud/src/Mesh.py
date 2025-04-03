@@ -11,7 +11,7 @@ def processMesh(arr):
 
     array = np.array(arr)
 
-    # print(array[:,-3:])
+    fileNum = int(array[0][-1])
 
     # if __name__ == '__main__':
     # print("Current Working Directory:", os.getcwd())
@@ -75,7 +75,7 @@ def processMesh(arr):
             print("Empty Mesh")
         else:
             if len(mesh.triangles) != 0:
-                success = o3d.io.write_triangle_mesh("generated_mesh.ply", mesh)  # To-Do: Determine where to output mesh files
+                success = o3d.io.write_triangle_mesh(f"generated_mesh{fileNum}.ply", mesh)  # To-Do: Determine where to output mesh files
                 if success:
                     print("Mesh Saved")
                 else:

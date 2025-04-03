@@ -58,6 +58,9 @@ using namespace sl;
 // Global variable to indicate if playback (SVO file input) is used.
 bool is_playback = false;
 
+bool called_python = false;
+int fileCounter = 0;
+
 // Function declarations.
 void print(string msg_prefix, ERROR_CODE err_code = ERROR_CODE::SUCCESS, string msg_suffix = "");
 void parseArgs(int argc, char** argv, InitParameters& param);
@@ -312,6 +315,11 @@ int main(int argc, char** argv) {
             cv::imshow(window_name, video_feed);  
             char key = cv::waitKey(20);
             if (key == 'q') {
+                
+                if (called_python == true) {
+                    finalize();
+                }
+
                 quit = true;
             }
             else if (key == 's') {
@@ -341,24 +349,28 @@ int main(int argc, char** argv) {
                         float r = ((color & 0x00FF0000) >> 16) / 255.0;
 
 
-
                         if (point.z != 0 && !std::isinf(point.z) && !std::isnan(point.z)) {
-                            points.push_back({ point.x, point.y, point.z, b, g, r });
+                            points.push_back({point.x, point.y, point.z, b, g, r, (float)fileCounter});
                         }
                     }
                 }
 
+                fileCounter++;
+
                 initialize();
+
+                called_python = true;
 
                 PyObject* pyList = PyList_New(points.size());
                 for (size_t i = 0; i < points.size(); i++) {
-                    PyObject* pyPoint = PyTuple_New(6);
+                    PyObject* pyPoint = PyTuple_New(7);
                     PyTuple_SetItem(pyPoint, 0, PyFloat_FromDouble(points[i][0]));
                     PyTuple_SetItem(pyPoint, 1, PyFloat_FromDouble(points[i][1]));
                     PyTuple_SetItem(pyPoint, 2, PyFloat_FromDouble(points[i][2]));
                     PyTuple_SetItem(pyPoint, 3, PyFloat_FromDouble(points[i][3]));
                     PyTuple_SetItem(pyPoint, 4, PyFloat_FromDouble(points[i][4]));
                     PyTuple_SetItem(pyPoint, 5, PyFloat_FromDouble(points[i][5]));
+                    PyTuple_SetItem(pyPoint, 6, PyFloat_FromDouble(points[i][6]));
                     PyList_SetItem(pyList, i, pyPoint); 
                 }
 
@@ -390,8 +402,6 @@ int main(int argc, char** argv) {
 
                     Py_XDECREF(pFunc);
                     Py_XDECREF(pModule);
-
-                    finalize();
                 }
 
                 }
