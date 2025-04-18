@@ -18,6 +18,7 @@ find_package(GLUT REQUIRED)
 find_package(GLEW REQUIRED)
 SET(OpenGL_GL_PREFERENCE GLVND)
 find_package(OpenGL REQUIRED)
+find_package(PythonLibs 3 REQUIRED)
 
 # --- Add PCL here ---
 find_package(PCL REQUIRED)
@@ -29,6 +30,7 @@ include_directories(${GLUT_INCLUDE_DIR})
 include_directories(${CUDA_INCLUDE_DIRS})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 include_directories(${PCL_INCLUDE_DIRS})
+include_directories(${PYTHON_INCLUDE_DIRS})
 
 link_directories(${ZED_LIBRARY_DIR})
 link_directories(${GLEW_LIBRARY_DIRS})
@@ -60,6 +62,7 @@ target_link_libraries(${PROJECT_NAME}
                         ${GLEW_LIBRARIES}
                         ${OpenCV_LIBRARIES}
                         ${PCL_LIBRARIES}
+                        pybind11::module
                         )
 
 if(INSTALL_SAMPLES)

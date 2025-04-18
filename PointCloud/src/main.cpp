@@ -28,6 +28,10 @@
 #include <pcl/io/pcd_io.h>
 #include <pcl/point_cloud.h>
 #include <pcl/point_types.h>
+#include <cstdlib>
+#include <Python.h>
+#include <Python.h>
+//#include <open3d/Open3D.h>
 
 // OpenCV includes (video feed window code is commented out below).
 #include <opencv2/opencv.hpp>
@@ -74,6 +78,7 @@ int main(int argc, char** argv) {
     // Set initialization parameters.
     InitParameters init_parameters;
     init_parameters.depth_mode = DEPTH_MODE::NEURAL; // Use NEURAL depth mode.
+	//The two lines below are used to set the depth range for the camera.(Anything outside this range is not captured)
     init_parameters.depth_minimum_distance = 0.2f * 1000.0f;
     init_parameters.depth_maximum_distance = 2.0f * 1000.0f;
     init_parameters.coordinate_system = COORDINATE_SYSTEM::RIGHT_HANDED_Y_UP;
@@ -226,6 +231,36 @@ int main(int argc, char** argv) {
             z_max += zTolerance;
 #if ENABLE_GUI
             auto t_filter_start = std::chrono::high_resolution_clock::now();
+            // --- Compute the 2D Bounding Box from Object Detection ---
+            float union_min_x = std::numeric_limits<float>::max();
+            float union_min_y = std::numeric_limits<float>::max();
+            float union_max_x = 0;
+            float union_max_y = 0;
+            bool valid_bbox = false;
+            for (auto& obj : objects.object_list) {
+                for (auto& pt : obj.bounding_box_2d) {
+                    union_min_x = std::min<float>(union_min_x, pt.x);
+                    union_min_y = std::min<float>(union_min_y, pt.y);
+                    union_max_x = std::max<float>(union_max_x, pt.x);
+                    union_max_y = std::max<float>(union_max_y, pt.y);
+                    valid_bbox = true;
+                }
+            }
+            if (!valid_bbox) {
+                // If no objects detected, use full image bounds.
+                union_min_x = 0;
+                union_min_y = 0;
+                union_max_x = camera_config.resolution.width;
+                union_max_y = camera_config.resolution.height;
+            }
+
+            // Convert the bounding box from camera resolution to point cloud resolution.
+            float scaleX = static_cast<float>(pc_resolution.width) / static_cast<float>(camera_config.resolution.width);
+            float scaleY = static_cast<float>(pc_resolution.height) / static_cast<float>(camera_config.resolution.height);
+            int pc_bbox_min_x = std::max<int>(0, static_cast<int>(union_min_x * scaleX));
+            int pc_bbox_min_y = std::max<int>(0, static_cast<int>(union_min_y * scaleY));
+            int pc_bbox_max_x = std::min<int>(pc_resolution.width - 1, static_cast<int>(union_max_x * scaleX));
+            int pc_bbox_max_y = std::min<int>(pc_resolution.height - 1, static_cast<int>(union_max_y * scaleY));
 
             // --- Retrieve the Full Point Cloud ---
             zed.retrieveMeasure(point_cloud, MEASURE::XYZRGBA, MEM::CPU, pc_resolution);
