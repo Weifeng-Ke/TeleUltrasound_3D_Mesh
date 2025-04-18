@@ -1,24 +1,45 @@
+# Tele-Ultrasound
+
+## Purpose: Help experts teleoperate remote ultrasound scanning by enhancing their depth perception.
+This program allows the experts to see the patient's live point cloud and save the patient mesh by pressing the 's' key and moving, pan rotating the patient mesh to see a vitual 3D model of the patient. 
+### Features
+ - The camera point cloud is displayed in a 3D OpenGL view
+ - 2D bounding boxes are used to filter out objects that's not the patient
+ - Identifying Patient in real time
+ - Produce Mesh file in .ply format by pressing the 's' key.
+ - The mesh file is saved in the same directory as the script
+	- The mesh file is named "generated_mesh{filenum}.ply"
+
 ![reversal](https://capsule-render.vercel.app/api?type=waving&text=How%20To%20Build%20Project&fontAlign=50&fontSize=60&desc=How%20To%20Run&descAlign=900&descAlignY=50&theme=gruvbox)
-# Project Build Tutorial
-Below is step by step how to build the project to work on your Window device
 
-## Getting Started
- - Get the latest [ZED SDK](https://www.stereolabs.com/developers/release/)
- - Check the [Documentation](https://www.stereolabs.com/docs/) (Documentation for this project is mainly from here)
+# Project Setup Instructions
+Below is step by step guide on how to setup, build and run the project on a Windows device
 
-### Setting up 
-1. Download and install the latest [ZED SDK.](https://www.stereolabs.com/en-ca/developers/release)
-2. Make sure there are:
-   * PointCloud/CMakeLists.txt
-   * PointCloud/src/
-   * PointCloud/README.md
+## Dependencies
+1. ZED SDK
+   * The ZED SDK is a development toolkit from Stereolabs that enables depth sensing, 3D mapping, and spatial tracking using ZED stereo cameras.
+   * Download the latest [ZED SDK](https://www.stereolabs.com/developers/release/)
+   * Refer to the ZED SDK [Documentation](https://www.stereolabs.com/docs/) for more information
+5. CMAKE (3.5.0+)
+   * CMake is a build system generator that manages project configuration and creates build files from a single source.
+   * Download the latest version of [CMAKE](https://cmake.org/download/)
+   * Refer to the CMAKE [Documentation](https://cmake.org/documentation/) for more information
+7. Visual Studio (Version 2015+ x64)
+   * Download the 64-bit version of [Visual Studio 2015 or newer](https://learn.microsoft.com/en-us/visualstudio/releases/2022/release-notes)
+   * Select the VisualC++ option while installing Visual Studio
+
+## Setting up 
+1. Clone this repository
+2. Make sure that the project includes the following directories and files:
+   * TeleUltrasound_3D_Mesh/PointCloud/CMakeLists.txt
+   * TeleUltrasound_3D_Mesh/PointCloud/src/
+   * TeleUltrasound_3D_Mesh/PointCloud/README.md
+
 ### Building on Windows
-We need [CMAKE](https://cmake.org/) (3.5.0+) and [Visual Studio](https://visualstudio.microsoft.com/vs/older-downloads/) (version 2015+). The application needs to be compiled at 64-bit.
-
-*NOTE: choose the VisualC++ option while installing Visual Studio.*
- 1. Open CMake-gui application
- 2. In “Where is the source code“, enter the path of the project folder where the CMakeLists.txt is located.
- 3. In “Where to build the binaries“, enter the previous path and add: /build.
+Before building, please ensure that all project dependencies have been installed. Building this project requires [CMAKE](https://cmake.org/) (3.5.0+) and [Visual Studio 2015+ 64-bit](https://learn.microsoft.com/en-us/visualstudio/releases/2022/release-notes).
+ 1. Open the **CMake-gui** application
+ 2. In “Where is the source code“, provide the path of the project folder where the CMakeLists.txt is located. The path should be similar to: \<project-root\>/TeleUltrasound_3D_Mesh/PointCloud
+ 3. In “Where to build the binaries“, provide the previous path followed by /build. The path should be similar to: \<project-root\>/TeleUltrasound_3D_Mesh/PointCloud/build
  4. Click on "Configure"
 Example:
 ![cmake_configure](https://github.com/user-attachments/assets/d9f0e4a2-bf28-4a82-b592-7e9dce1f6009)
