@@ -1,7 +1,7 @@
 # Tele-Ultrasound
 
-## Purpose: Helping expert navigate ultrasound scaninng at remote places by offering them a real time point cloud of the patient.
- 
+## Purpose: Help experts teleoperate remote ultrasound scanning by enhancing their depth perception.
+This program allows the experts to see the patient's live point cloud and save the patient mesh by pressing the 's' key and moving, pan rotating the patient mesh to see a vitual 3D model of the patient. 
 ### Features
  - The camera point cloud is displayed in a 3D OpenGL view
  - 2D bounding boxes are used to filter out objects that's not the patient
