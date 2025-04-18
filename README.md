@@ -51,7 +51,7 @@ Example:
 ![pic1](https://github.com/user-attachments/assets/acb00bd5-6817-4bdc-8d0c-70b587268c42)
 9. A Visual Studio solution has been generated. Open Project.sln and set it in Release mode.
 ![pic2](https://github.com/user-attachments/assets/afb36a3c-2d16-45db-8618-9f42f7019940)
-10. To run the builds from the Build menu or from keyboard shortcuts, set the ZED_concurrent_detections target as the startup project
+10. To run the builds from the Build menu or from keyboard shortcuts, set the Point Cloud target as the startup project
 (right click and choose)
 
 ![pic3](https://github.com/user-attachments/assets/6779bd9d-a51c-4db7-8e1b-6385892b87e0)
@@ -65,14 +65,14 @@ Example:
 ## Run the program
 *NOTE: The ZED v1 is not compatible with this module*
 - Navigate to the build directory and launch the executable
-- Or open a terminal in the build directory and run the sample :
-
-      ./ZED_Object_detection_multi_instance
 
 ### Features
  - The camera point cloud is displayed in a 3D OpenGL view
- - 3D bounding boxes and human skeletons around detected objects are drawn
- - Objects classes and confidences can be changed
+ - 2D bounding boxes are used to filter out objects that's not the patient
+ - Identifying Patient in real time
+ - Produce Mesh file in .ply format by pressing the 's' key.
+ - The mesh file is saved in the same directory as the script
+	- The mesh file is named "generated_mesh{filenum}.ply"
 
 ## Support
-If you need assistance go to our Community site at https://community.stereolabs.com/
+If you need assistance email wke01@student.ubc.ca
