@@ -74,22 +74,13 @@ Before building, please ensure that all project dependencies have been installed
 
 12. You can now edit and compile your program in the Visual Studio IDE. Hit the Ctrl+F5 key to launch the program.
 
-## For more information about building projects involving the ZED IDE see the following documentation:
+### For more information about building projects involving the ZED IDE see the following documentation:
  - Build for [Windows](https://www.stereolabs.com/docs/app-development/cpp/windows/)
  - Build for [Linux/Jetson](https://www.stereolabs.com/docs/app-development/cpp/linux/)
 
 
-## Run the program
-*NOTE: The ZED v1 is not compatible with this module*
+## Run the Point Cloud Program
 - Navigate to the build directory and launch the executable
-- Or open a terminal in the build directory and run the sample :
+- Or open a terminal in the build directory and run the executable:
 
-      ./ZED_Object_detection_multi_instance
-
-### Features
- - The camera point cloud is displayed in a 3D OpenGL view
- - 3D bounding boxes and human skeletons around detected objects are drawn
- - Objects classes and confidences can be changed
-
-## Support
-If you need assistance go to our Community site at https://community.stereolabs.com/
+      ./ZED_Patient_3D
