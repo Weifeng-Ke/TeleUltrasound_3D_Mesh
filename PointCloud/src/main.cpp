@@ -8,15 +8,8 @@
 //      coordinates lie inside that 2D box are kept (preserving the native color).
 //   3. Display the filtered point cloud in the 3D viewer.
 //   4. Print the FPS (frames per second) to the console.
-// 
-// 
-//
-//  ### Features
-//      - The camera point cloud is displayed in a 3D OpenGL view
-//      - 2D bounding boxes are used to filter out objects that's not the patient
-//      - Identifying Patient in real time
-//      - Produce Mesh file in.ply format by pressing the 's' key.
-//      - The mesh file is saved in the same directory as the script
+//   5. Produce Mesh file in.ply format by pressing the 's' key.
+//   6. The mesh file is saved in the same directory as the script
 //      - The mesh file is named "generated_mesh{filenum}.ply"
 // 	
 // Performance improvements include clearing the output buffer once,
