@@ -24,9 +24,6 @@
 #include <algorithm>     // For std::min, std::max
 #include <limits>        // For numeric_limits
 #include <cstdlib>
-#include <pybind11/pybind11.h>
-#include <pybind11/numpy.h>
-#include <pybind11/embed.h>
 #include <Python.h>
 //#include <open3d/Open3D.h>
 
