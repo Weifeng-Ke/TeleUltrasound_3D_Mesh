@@ -1,7 +1,7 @@
 # Tele-Ultrasound 3D Mesh
 
 ## Purpose: 
-This project is intended to be used with the ZED Mini stereo camera in order to produce Point Clouds and 3D meshes of a patient. These meshes can be used to provide the Tele-Ultrasound experts with a 3D visual and haptic feeback for improved orientation in virutal space.
+This project is intended to be used with the ZED Mini stereo camera in order to produce Point Clouds and 3D meshes of a patient. These meshes can be used to provide the Tele-Ultrasound experts with a 3D visual and haptic feedback for improved orientation in virtual space.
 
 **TODO: PLEASE REVAMP THIS SECTION,** I am not sure what is supposed to be here but it doesn't seem right
 ### Features
@@ -13,7 +13,7 @@ This project is intended to be used with the ZED Mini stereo camera in order to 
 	- The mesh file is named "generated_mesh{filenum}.ply"
 
 # Point Cloud Project Setup Instructions (C++)
-Below is step by step guide on how to setup, build and run the Point Cloud Project on a Windows device
+Below is step by step guide on how to set up, build and run the Point Cloud Project on a Windows device
 
 ## Point Cloud Project Dependencies
 1. ZED SDK
@@ -29,7 +29,7 @@ Below is step by step guide on how to setup, build and run the Point Cloud Proje
    * Select the VisualC++ option while installing Visual Studio
 4. Python
    * Download the latest version of [Python](https://www.python.org/)
-   * Select "Add to path" while installing python
+   * Select "Add to PATH" while installing python
 
 ## Point Cloud Project Setup 
 1. Clone this repository
@@ -94,18 +94,18 @@ Before building, please ensure that all project dependencies have been installed
 Below is step by step guide on how to setup, build and run the Mesh Project on a Windows device
 
 ## Mesh Project Dependencies
-1. open3D
+1. Open3D
    * An open-source library for working with 3D data like point clouds and meshes.
    * To download this library, use the command `pip install open3d`
    * Refer to the Open3D [Documentation](https://www.open3d.org/docs/release/) for more information
-2. cython
+2. Cython
    * A tool that lets you compile Python code into C extensions.
    * To download this library, use the command `pip install Cython`
    * Refer to the Cython [Documentation](https://cython.readthedocs.io/en/latest/) for more information
-3. numpy
+3. NumPy
    * A library for numerical computing in Python.
    * To download this library, use the command `pip install numpy`
-   * Refer to the Cython [Documentation](https://numpy.org/doc/stable/) for more information
+   * Refer to the NumPy [Documentation](https://numpy.org/doc/stable/) for more information
 4. setuptools (usually installed with pip but should be verified)
    * A package development and distribution library used to build, package, and install Python projects.
    * To download this library, use the command `pip install setuptools`
@@ -117,8 +117,8 @@ Below is step by step guide on how to setup, build and run the Mesh Project on a
    * TeleUltrasound_3D_Mesh/PointCloud/src/Mesh.py
    * TeleUltrasound_3D_Mesh/PointCloud/src/setup.py
    * TeleUltrasound_3D_Mesh/PointCloud/src/wrapper.pyx
-2. In a command line, navigate to the /src directory containing setup.py and mesh.py. The path should be similar to \<project-root\>/TeleUltrasound_3D_Mesh/PointCloud/build
-3. Setup the project by running the command 'setup.py build_ext - - -inplace'
+2. In a command line, navigate to the /src directory containing setup.py and mesh.py. The path should be similar to \<project-root\>/TeleUltrasound_3D_Mesh/PointCloud/src
+3. Setup the project by running the command 'setup.py build_ext --inplace'
 4. Verify that wrapper.c and a .pyd file have been generated
 5. You can now run the Mesh.py program by navigating to the /src directory and using the command 'python Mesh.py'
 
@@ -134,7 +134,7 @@ Below is step by step guide on how to setup the hardware for this project
 
 ## Setting Up the Hardware
 1. Set up the Tripod
-2. Attatch the Tripod Clamp to the Tripod
+2. Attach the Tripod Clamp to the Tripod
 3. Secure the ZED Mini in the Tripod Clamp
 4. Connect the ZED Mini to the Lab Laptop using the USB-C to USB-C cable
    * A "Change Camera" icon should appear in the top right of the screen.
@@ -143,7 +143,7 @@ Below is step by step guide on how to setup the hardware for this project
 
 ![Camera_Flip_Camera_Indicator](https://github.com/user-attachments/assets/317d9c56-e294-40f0-a2a5-162a4a8c8c1e)
 
-5. Use the tripod to orient the ZED Mini such that the patient is in view of the camera
+5. Use the tripod to position the ZED Mini such that the patient is in view of the camera
 
 ## Support
 For assistance, please email wke01@student.ubc.ca
