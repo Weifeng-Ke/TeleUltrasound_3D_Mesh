@@ -18,13 +18,16 @@ Below is step by step guide on how to setup, build and run the Point Cloud Proje
    * The ZED SDK is a development toolkit from Stereolabs that enables depth sensing, 3D mapping, and spatial tracking using ZED stereo cameras.
    * Download the latest [ZED SDK](https://www.stereolabs.com/developers/release/)
    * Refer to the ZED SDK [Documentation](https://www.stereolabs.com/docs/) for more information
-5. CMAKE (3.5.0+)
+2. CMAKE (3.5.0+)
    * CMake is a build system generator that manages project configuration and creates build files from a single source.
    * Download the latest version of [CMake](https://cmake.org/download/)
    * Refer to the CMAKE [Documentation](https://cmake.org/documentation/) for more information
-7. Visual Studio (Version 2015+ x64)
+3. Visual Studio (Version 2015+ x64)
    * Download the 64-bit version of [Visual Studio 2015 or newer](https://learn.microsoft.com/en-us/visualstudio/releases/2022/release-notes)
    * Select the VisualC++ option while installing Visual Studio
+4. Python
+   * Download the latest version of [Python](https://www.python.org/)
+   * Select "Add to path" while installing python
 
 ## Point Cloud Project Setup 
 1. Clone this repository
