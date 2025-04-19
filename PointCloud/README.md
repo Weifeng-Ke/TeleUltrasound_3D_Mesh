@@ -1,7 +1,9 @@
-# Tele-Ultrasound
+# Tele-Ultrasound 3D Mesh
 
-## Purpose: Help experts teleoperate remote ultrasound scanning by enhancing their depth perception.
-This program allows the experts to see the patient's live point cloud and save the patient mesh by pressing the 's' key and moving, pan rotating the patient mesh to see a vitual 3D model of the patient. 
+## Purpose: 
+This project is intended to be used with the ZED Mini stereo camera in order to produce Point Clouds and 3D meshes of a patient. These meshes can be used to provide the Tele-Ultrasound experts with a 3D visual and haptic feeback for improved orientation in virutal space.
+
+[comment]: <> TODO: PLEASE REVAMP THIS SECTION, I am not sure what is supposed to be here but it doesn't seem right
 ### Features
  - The camera point cloud is displayed in a 3D OpenGL view
  - 2D bounding boxes are used to filter out objects that's not the patient
@@ -87,3 +89,38 @@ Before building, please ensure that all project dependencies have been installed
 - Or open a terminal in the build directory and run the executable:
 
       ./ZED_Patient_3D
+
+# Mesh Project Setup Instructions (Python)
+Below is step by step guide on how to setup, build and run the Mesh Project on a Windows device
+
+## Python Project Libraries
+1. Open3D
+
+# Hardware Setup
+Below is step by step guide on how to setup the hardware for this project
+
+## Hardware Requirements
+1. Lab Laptop
+2. ZED Mini Stereo Camera
+3. USB-C to USB-C cable (USB 3.0 or faster)
+4. Tripod
+5. Tripod Clamp (to hold the ZED Mini)
+
+## Setting Up the Hardware
+1. Set up the Tripod
+2. Attatch the Tripod Clamp to the Tripod
+3. Secure the ZED Mini in the Tripod Clamp
+4. Connect the ZED Mini to the Lab Laptop using the USB-C to USB-C cable
+   * A "Change Camera" icon should appear in the top right of the screen.
+   * If the indicator is not present, try unplugging and flipping the USB-C connection on the ZED Mini side (unplug and turn the USB-C port upside down).
+   * The ZED Mini is sensitive to the orientation of the USB-C cable
+
+![Camera_Flip_Camera_Indicator](https://github.com/user-attachments/assets/317d9c56-e294-40f0-a2a5-162a4a8c8c1e)
+
+5. Use the tripod to orient the ZED Mini such that the patient is in view of the camera
+
+
+
+
+
+
