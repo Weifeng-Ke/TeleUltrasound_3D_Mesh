@@ -9,6 +9,16 @@
 //   3. Display the filtered point cloud in the 3D viewer.
 //   4. Print the FPS (frames per second) to the console.
 // 
+// 
+//
+//  ### Features
+//      - The camera point cloud is displayed in a 3D OpenGL view
+//      - 2D bounding boxes are used to filter out objects that's not the patient
+//      - Identifying Patient in real time
+//      - Produce Mesh file in.ply format by pressing the 's' key.
+//      - The mesh file is saved in the same directory as the script
+//      - The mesh file is named "generated_mesh{filenum}.ply"
+// 	
 // Performance improvements include clearing the output buffer once,
 // restricting processing to the region of interest, and using OpenMP to
 // parallelize the filtering loop.
@@ -144,9 +154,9 @@ int main(int argc, char** argv) {
     }
 
     // Runtime thresholds.
-    int detection_confidence_od = 80; // For object detection.
+	int detection_confidence_od = 80; // For object detection. The higher the value, the more accurate the detection and the lower the probability of successful detection.
     ObjectDetectionRuntimeParameters detection_parameters_rt(detection_confidence_od);
-    int body_detection_confidence = 60; // For body tracking.
+    int body_detection_confidence = 60; // For body tracking. The higher the value, the more accurate the detection and the lower the probability of successful detection.
     BodyTrackingRuntimeParameters body_tracking_parameters_rt(body_detection_confidence);
 
     //---------------------------------------------------------------------------
@@ -248,6 +258,7 @@ int main(int argc, char** argv) {
             skeletons.body_list.clear(); // Ensure skeleton list is empty.
 
 #if ENABLE_GUI
+			//Start the latency timer
             auto t_filter_start = std::chrono::high_resolution_clock::now();
             // --- Compute the 2D Bounding Box from Object Detection ---
             float union_min_x = std::numeric_limits<float>::max();
@@ -301,7 +312,7 @@ int main(int argc, char** argv) {
             filtered_point_cloud.updateGPUfromCPU();
 
             // --- (Optional) 2D Overlay Rendering for Video Feed ---
-            // The following block is commented out to reduce overhead.
+            // The following can be commented out to reduce overhead.
             
             zed.retrieveImage(image_left, VIEW::LEFT, MEM::CPU, display_resolution);
             render_2D(video_feed, img_scale, objects, skeletons,
@@ -321,6 +332,7 @@ int main(int argc, char** argv) {
             }
             else if (key == 's') {
                 //sl::Mat filtered_point_cloud;
+				//The retriveMeasure method retrives the filtered point cloud
                 zed.retrieveMeasure(filtered_point_cloud, MEASURE::XYZRGBA);
                 auto write_suceed = filtered_point_cloud.write("Filtered_Pointcloud.ply");
                 if (write_suceed == sl::ERROR_CODE::SUCCESS)
@@ -333,7 +345,7 @@ int main(int argc, char** argv) {
                 const int height = filtered_point_cloud.getHeight();
 
                 std::vector<std::vector<float>> points;
-
+                //Start the f
                 for (int y = 0; y < height; y++) {
                     for (int x = 0; x < width; x++) {
                         sl::float4 point;
@@ -411,7 +423,9 @@ int main(int argc, char** argv) {
             // clear the 3D bounding box list
             objects.object_list.clear();
             // Pass the (empty) skeletons so that no skeleton is shown.
+			//Watch the live filtered point cloud and camera pose in open 3D viewer
             viewer.updateData(filtered_point_cloud, objects, skeletons, cam_w_pose.pose_data);
+			//Stop the timer and calculate the latency time
             auto t_filter_end = std::chrono::high_resolution_clock::now();
             float filter_time = std::chrono::duration<float, std::milli>(t_filter_end - t_filter_start).count();
             std::cout << "Latency Time: " << filter_time << " ms\n" << flush;
