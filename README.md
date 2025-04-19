@@ -3,7 +3,7 @@
 ## Purpose: 
 This project is intended to be used with the ZED Mini stereo camera in order to produce Point Clouds and 3D meshes of a patient. These meshes can be used to provide the Tele-Ultrasound experts with a 3D visual and haptic feedback for improved orientation in virtual space.
 
-**TODO: PLEASE REVAMP THIS SECTION,** I am not sure what is supposed to be here but it doesn't seem right
+**TODO: WEIFENG - PLEASE REVAMP THE FEATURES SECTION,** I am not sure what is supposed to be here but it doesn't seem right
 ### Features
  - The camera point cloud is displayed in a 3D OpenGL view
  - 2D bounding boxes are used to filter out objects that's not the patient
@@ -111,7 +111,7 @@ Below is step by step guide on how to setup, build and run the Mesh Project on a
    * To download this library, use the command `pip install setuptools`
    * Refer to the Cython [Documentation](https://setuptools.pypa.io/en/latest/) for more information
 
-**TODO: PLEASE REVIEW AND TEST THIS SECTION**
+**TODO: RUDY - PLEASE REVIEW AND TEST THE MESH PROJECT SETUP SECTION**
 ## Mesh Project Setup
 1. Make sure that the project includes the following files:
    * TeleUltrasound_3D_Mesh/PointCloud/src/Mesh.py
