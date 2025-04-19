@@ -93,8 +93,34 @@ Before building, please ensure that all project dependencies have been installed
 # Mesh Project Setup Instructions (Python)
 Below is step by step guide on how to setup, build and run the Mesh Project on a Windows device
 
-## Python Project Libraries
-1. Open3D
+## Mesh Project Dependencies
+1. open3D
+   * An open-source library for working with 3D data like point clouds and meshes.
+   * To download this library, use the command `pip install open3d`
+   * Refer to the Open3D [Documentation](https://www.open3d.org/docs/release/) for more information
+2. cython
+   * A tool that lets you compile Python code into C extensions.
+   * To download this library, use the command `pip install Cython`
+   * Refer to the Cython [Documentation](https://cython.readthedocs.io/en/latest/) for more information
+3. numpy
+   * A library for numerical computing in Python.
+   * To download this library, use the command `pip install numpy`
+   * Refer to the Cython [Documentation](https://numpy.org/doc/stable/) for more information
+4. setuptools (usually installed with pip but should be verified)
+   * A package development and distribution library used to build, package, and install Python projects.
+   * To download this library, use the command `pip install setuptools`
+   * Refer to the Cython [Documentation](https://setuptools.pypa.io/en/latest/) for more information
+
+[comment]: <> TODO: PLEASE REVIEW AND TEST THIS SECTION
+## Mesh Project Setup
+1. Make sure that the project includes the following files:
+   * TeleUltrasound_3D_Mesh/PointCloud/src/Mesh.py
+   * TeleUltrasound_3D_Mesh/PointCloud/src/setup.py
+   * TeleUltrasound_3D_Mesh/PointCloud/src/wrapper.pyx
+2. In a command line, navigate to the /src directory containing setup.py and mesh.py. The path should be similar to \<project-root\>/TeleUltrasound_3D_Mesh/PointCloud/build
+3. Setup the project by running the command 'setup.py build_ext - - -inplace'
+4. Verify that wrapper.c and a .pyd file have been generated
+5. You can now run the Mesh.py program by navigating to the /src directory and using the command 'python Mesh.py'
 
 # Hardware Setup
 Below is step by step guide on how to setup the hardware for this project
