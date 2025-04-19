@@ -3,14 +3,6 @@
 ## Purpose: 
 This project is intended to be used with the ZED Mini stereo camera in order to produce Point Clouds and 3D meshes of a patient. These meshes can be used to provide the Tele-Ultrasound experts with a 3D visual and haptic feedback for improved orientation in virtual space.
 
-**TODO: WEIFENG - PLEASE REVAMP THE FEATURES SECTION,** I am not sure what is supposed to be here but it doesn't seem right
-### Features
- - The camera point cloud is displayed in a 3D OpenGL view
- - 2D bounding boxes are used to filter out objects that's not the patient
- - Identifying Patient in real time
- - Produce Mesh file in .ply format by pressing the 's' key.
- - The mesh file is saved in the same directory as the script
-	- The mesh file is named "generated_mesh{filenum}.ply"
 
 # Point Cloud Project Setup Instructions (C++)
 Below is step by step guide on how to set up, build and run the Point Cloud Project on a Windows device
