@@ -145,8 +145,5 @@ Below is step by step guide on how to setup the hardware for this project
 
 5. Use the tripod to orient the ZED Mini such that the patient is in view of the camera
 
-
-
-
-
-
+## Support
+For assistance, please email wke01@student.ubc.ca
