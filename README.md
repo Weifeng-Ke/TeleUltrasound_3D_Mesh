@@ -113,7 +113,8 @@ Below is step by step guide on how to setup, build and run the Mesh Project on a
 2. In a command line, navigate to the /src directory containing setup.py and mesh.py. The path should be similar to \<project-root\>/TeleUltrasound_3D_Mesh/PointCloud/src
 3. Setup the project by running the command 'setup.py build_ext --inplace'
 4. Verify that wrapper.c and a .pyd file have been generated
-5. You can now run the Mesh.py program by navigating to the /src directory and using the command 'python Mesh.py'
+5. Ensure that main.cpp properly inlcudes Python.h
+6. The Mesh.py program is now callable by main.cpp
 
 # Hardware Setup
 Below is step by step guide on how to setup the hardware for this project
