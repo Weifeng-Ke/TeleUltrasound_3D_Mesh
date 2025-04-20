@@ -89,6 +89,7 @@ Below is step by step guide on how to setup, build and run the Mesh Project on a
 1. Open3D
    * An open-source library for working with 3D data like point clouds and meshes.
    * To download this library, use the command `pip install open3d`
+   * NOTE: Open3D runs on Python 3.11 or older as of the making of this file
    * Refer to the Open3D [Documentation](https://www.open3d.org/docs/release/) for more information
 2. Cython
    * A tool that lets you compile Python code into C extensions.
