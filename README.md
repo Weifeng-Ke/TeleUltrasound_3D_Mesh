@@ -104,7 +104,6 @@ Below is step by step guide on how to setup, build and run the Mesh Project on a
    * To download this library, use the command `pip install setuptools`
    * Refer to the Cython [Documentation](https://setuptools.pypa.io/en/latest/) for more information
 
-**TODO: RUDY - PLEASE REVIEW AND TEST THE MESH PROJECT SETUP SECTION**
 ## Mesh Project Setup
 1. Make sure that the project includes the following files:
    * TeleUltrasound_3D_Mesh/PointCloud/src/Mesh.py
