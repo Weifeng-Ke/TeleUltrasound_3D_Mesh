@@ -113,7 +113,8 @@ Below is step by step guide on how to setup, build and run the Mesh Project on a
 3. Setup the project by running the command 'setup.py build_ext --inplace'
 4. Verify that wrapper.c and a .pyd file have been generated
 5. Ensure that main.cpp properly inlcudes Python.h
-6. The Mesh.py program is now callable by main.cpp
+6. Rebuild the project using Cmake
+7. The Mesh.py program is now callable by main.cpp
 
 # Hardware Setup
 Below is step by step guide on how to setup the hardware for this project
