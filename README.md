@@ -196,6 +196,3 @@ Below is step by step guide on how to setup the hardware for this project
 ![Camera_Flip_Camera_Indicator](https://github.com/user-attachments/assets/317d9c56-e294-40f0-a2a5-162a4a8c8c1e)
 
 5. Use the tripod to position the ZED Mini such that the patient is in view of the camera
-
-## Support
-For assistance, please email wke01@student.ubc.ca
