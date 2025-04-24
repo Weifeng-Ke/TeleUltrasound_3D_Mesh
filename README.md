@@ -117,7 +117,28 @@ Below is step by step guide on how to setup, build and run the Mesh Project on a
 7. The Mesh.py program is now callable by main.cpp
 
 # Mesh Code Parameters
-The Mesh code resides within the Mesh.py file and can be altered to change the generated mesh resolution and generation speed. 
+The Mesh code resides within the Mesh.py file.
+The code can be altered to change the generated mesh resolution and generation speed. 
+The voxel downsizing can be altered by changing voxel_size in line 31:
+````
+    cloud = cloud.voxel_down_sample(voxel_size = 3)
+````
+Larger values will lead to lower resolutions and faster generation speeds. 
+
+Resolution and generation speed can also be effectively altered by changing the radii used for the Ball Pivoting Algorithm.
+This can be found on line 68:
+````
+    radii = o3d.utility.DoubleVector([avg_spacing * 3, avg_spacing * 3.5, avg_spacing * 4, avg_spacing*4.5, avg_spacing*5]) 
+````
+\***Note** While the radii values can be any arbitrary number, it is recommended to keep them multiples of the average spacing of points \*
+
+Radii values can be individually changed and can be added or removed. More radii values leads to less holes but longer generation speeds. Larger values lead to lower resolution and faster generation speeds. 
+## Additional Features
+Commented out on line 23 is code that allows for the program to instead read point cloud data from a file. To run and test this feature, the code must be removed from the processMesh() function. 
+
+Commented out on lines 45, 89-120 is the rough code for parallelization of the mesh function. The current implementation of this feature does not function with the point cloud generation integretion method (ie. the use of a Cython wrapper). 
+
+Commented out on lines 50-51 is code for alternative methods of aligning normal orientations. These orient normals either towards a set direction or towards a "camera" perspective. 
 
 # Hardware Setup
 Below is step by step guide on how to setup the hardware for this project
