@@ -79,8 +79,35 @@ Before building, please ensure that all project dependencies have been installed
 ## Run the Point Cloud Program
 - Navigate to the build directory and launch the executable
 - Or open a terminal in the build directory and run the executable:
-
+````
       ./ZED_Patient_3D
+````
+# Point Cloud Code Parameters
+The Point Cloud code resides within the main.cpp file.
+The code can be altered to change the depth cutoff for point cloud generation. 
+The minimum depth cutoff can be specified by setting init_parameters.depth_minimum_distance to the desired minimum depth (in mm) on line 97:
+````cpp
+    init_parameters.depth_minimum_distance = 0.2f * 1000.0f;
+````
+The maximum depth cutoff can be specified by setting init_parameters.depth_maximum_distance to the desired maximum depth (in mm) on line 98:
+````cpp
+    init_parameters.depth_maximum_distance = 0.85f * 1000.0f;
+````
+The confidence cutoffs for object detection and body tracking can be altered as well.
+The object detection confidence cutoff can be specified by setting detection_confidence_od to the desired cutoff (in %) on line 150:
+````cpp
+    int detection_confidence_od = 80;
+````
+The body tracking confidence cutoff can be specified by setting body_detection_confidence to the desired cutoff (in %) on line 152:
+````cpp
+    int body_detection_confidence = 60;
+````
+The generated full point clouds and filtered point clouds can be accessed through the point_cloud and filtered_point_cloud objects respectively.
+The full point cloud is retrieved on line 288:
+````cpp
+    zed.retrieveMeasure(point_cloud, MEASURE::XYZRGBA, MEM::CPU, pc_resolution);
+````
+The filtered point cloud is generated from the full point cloud on lines 296-305.
 
 # Mesh Project Setup Instructions (Python)
 Below is step by step guide on how to setup, build and run the Mesh Project on a Windows device
