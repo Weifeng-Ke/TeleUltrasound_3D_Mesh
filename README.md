@@ -1,5 +1,7 @@
 # Tele-Ultrasound 3D Mesh
 
+Welcome to the set-up documentation for the 3D Mesh project!
+
 ## Purpose: 
 This project is intended to be used with the ZED Mini stereo camera in order to produce Point Clouds and 3D meshes of a patient. These meshes can be used to provide the Tele-Ultrasound experts with a 3D visual and haptic feedback for improved orientation in virtual space.
 
