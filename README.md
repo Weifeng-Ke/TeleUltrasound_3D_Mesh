@@ -116,6 +116,9 @@ Below is step by step guide on how to setup, build and run the Mesh Project on a
 6. Rebuild the project using Cmake
 7. The Mesh.py program is now callable by main.cpp
 
+# Mesh Code Parameters
+The Mesh code resides within the Mesh.py file and can be altered to change the generated mesh resolution and generation speed. 
+
 # Hardware Setup
 Below is step by step guide on how to setup the hardware for this project
 
