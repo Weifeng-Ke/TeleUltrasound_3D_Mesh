@@ -21,9 +21,10 @@ Below is step by step guide on how to set up, build and run the Point Cloud Proj
 3. Visual Studio (Version 2015+ x64)
    * Download the 64-bit version of [Visual Studio 2015 or newer](https://learn.microsoft.com/en-us/visualstudio/releases/2022/release-notes)
    * Select the VisualC++ option while installing Visual Studio
-4. Python
-   * Download the latest version of [Python](https://www.python.org/)
+4. Python 3.11
+   * Download the latest version of [Python 3.11](https://www.python.org/downloads/)
    * Select "Add to PATH" while installing python
+   * *NOTE* Please ensure that you are using Python 3.11 for compatibility for Open3D
 
 ## Point Cloud Project Setup 
 1. Clone this repository
