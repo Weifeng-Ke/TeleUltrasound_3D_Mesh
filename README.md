@@ -143,8 +143,12 @@ Below is step by step guide on how to setup, build and run the Mesh Project on a
 3. Setup the project by running the command 'setup.py build_ext --inplace'
 4. Verify that wrapper.c and a .pyd file have been generated
 5. Ensure that main.cpp properly inlcudes Python.h
-6. Rebuild the project using Cmake
-7. The Mesh.py program is now callable by main.cpp
+6. Ensure that the path variable is reflective of the actual path of the src directory on main.cpp line 75:
+````cpp
+    PyList_Append(sys_path, PyUnicode_FromString("C:/Users/capstone/Desktop/ZED_Point_cloud_filtered/PointCloud/src"));
+````
+7. Rebuild the Point Cloud (C++) project using Cmake
+8. The Mesh.py program is now callable by main.cpp
 
 # Mesh Code Parameters
 The Mesh code resides within the Mesh.py file.
